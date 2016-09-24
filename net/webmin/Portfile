@@ -12,7 +12,7 @@ maintainers         nomaintainer
 
 description         Web based server configuration
 long_description    Web based server configuration
-homepage            https://www.gnupg.org/related_software/libassuan
+homepage            https://www.webmin.com/
 
 master_sites       sourceforge:webadmin/${name}/${version}/
 extract.suffix     .tar.gz
@@ -22,3 +22,4 @@ checksums          md5 e663c3da61c08fc9ecaf1aeab74041e0 \
                    
 #configure.asroot   yes                   
 #configure.cmd      ./setup.sh ${prefix}/libexec/webmin
+

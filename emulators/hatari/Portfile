@@ -3,6 +3,7 @@
 
 # tested on 10.4 PPC, 10.4 Intel, 10.5 Intel, 10.6 with LibCxx upgrade, 10.7, 10.11
 # hatari command line builds on all systems
+# hatari python UI not needed with MacOSX GUI or command line versions - has unspecified python version so not included
 # hatari MacOSX GUI builds on >= 10.6 as NSWindowDelegate is used and is only 10.6 onwards
 # MacOSX GUI does not build with gcc* or llvm-gcc-4.2
 # winuae works on all with gcc flag modification below. 
@@ -37,19 +38,14 @@ depends_lib             port:libsdl \
 
 # 1. fix hard-coded installation directory for MacOSX bundle
 # 2. delete warning flag in winuae emulator code not supported by GCC42
+# 3. disable python ui - not needed for MacOSX
 post-extract {
      reinplace "s|/Applications|${applications_dir}|g" ${worksrcpath}/src/CmakeLists.txt
      reinplace "s|-Wno-maybe-uninitialized||g" ${worksrcpath}/src/cpu/CmakeLists.txt
+     reinplace "s|add_subdirectory(python-ui)||g" ${worksrcpath}/CmakeLists.txt
 }
 
-# update python code to work with python3 in case user has selected python3 variant
-# verified to work with all versions of python back to MacOSX Tiger
-# a proper fix would be to set the python variant, and then 
-# add designated python references in build script => upstream
-patchfiles-append      001-hatari-gentypes-python3-fix.diff
-
 # default to install MacOSX GUI application, and then adjust for OS variations
-
 platform darwin {
     if { ${os.major} <= 9 } {
         # 10.4 and 10.5 cannot build the MacOSX GUI at present
@@ -62,8 +58,7 @@ platform darwin {
     }
 }
 
-# ensure cmake's choice of compiler is correctly passed in (doesn't always seem to be?)
-# may not be strictly necessary, but won't hurt
+# ensure cmake's choice of compiler is correctly passed in (doesn't always seem to be)
 configure.args-append   -DCMAKE_C_COMPILER=${configure.cc}
 
 # these settings are copied from the previous portfile (1.7 version)
@@ -81,9 +76,6 @@ variant winuae description "Enable WinUAE CPU core (experimental)" {
 }
 
 platform darwin {
-	# sdl2 can be used on MacOSX 10.6 or later (for 10.6, need to add MacOSX10.7.sdk to build libsdl2)
-	# no combination of tricks allowed presently current libSDL@2.04 to build, or the web-installed SDL2.framework to work, on 10.5
-	# it is possible an older version of libsdl2, perhaps @2.01, might install and be useable on 10.5/Intel but this is left as an exercise for the reader
 	if { ${os.major} >= 10 } {
 		variant sdl2 description "Use SDL2" {
 			configure.args-append  -DENABLE_SDL2:BOOL=1
