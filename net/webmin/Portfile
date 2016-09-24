@@ -1,0 +1,24 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id: Portfile 150359 2016-07-17 07:30:36Z larryv@macports.org $
+
+PortSystem          1.0
+
+name                webmin
+version             1.810
+categories          net
+platforms           darwin
+license             LGPL-2.1+ GPL-3+
+maintainers         nomaintainer
+
+description         Web based server configuration
+long_description    Web based server configuration
+homepage            https://www.gnupg.org/related_software/libassuan
+
+master_sites       sourceforge:webadmin/${name}/${version}/
+extract.suffix     .tar.gz
+checksums          md5 e663c3da61c08fc9ecaf1aeab74041e0 \
+                   sha1 2be9d2a38fef2bdff0e116ae8fd846e4655c6e37 \
+                   rmd160 5812bdff570110aad2b321a5af7fa62acc08176d
+                   
+#configure.asroot   yes                   
+#configure.cmd      ./setup.sh ${prefix}/libexec/webmin
