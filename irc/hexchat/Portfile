@@ -1,0 +1,109 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id: Portfile 153435 2016-09-30 05:30:04Z ionic@macports.org $
+
+PortSystem          1.0
+
+name                hexchat
+version             2.12.1
+set branch          [join [lrange [split ${version} .] 0 1] .]
+categories          irc
+maintainers         raimue \
+                    openmaintainer
+description         IRC client based on XChat
+homepage            http://hexchat.github.io/
+platforms           darwin
+license             GPL-2+
+
+long_description \
+    HexChat is a graphical IRC client using GTK2 that has \
+    many features and can be scripted with Perl and/or Python. \
+    It is based on XChat, but unlike its predecessor completely \
+    free software.
+
+master_sites        https://dl.hexchat.net/hexchat/
+use_xz yes
+
+checksums           rmd160  877b00c61a2a32a9297babbaf7e0e8536f5d301f \
+                    sha256  5201b0c6d17dcb8c2cb79e9c39681f8e052999ba8f7b5986d5c1e7dc68fa7c6b
+
+depends_build       port:pkgconfig \
+                    port:intltool \
+                    port:gnome-common
+
+depends_lib         port:gtk2 \
+                    port:libsexy \
+                    path:bin/perl:perl5 \
+                    port:libpng \
+                    port:libnotify \
+                    port:gettext
+
+patchfiles          patch-include-order.diff \
+                    patch-sysinfo-plugin-on-10.9-and-lower.diff
+
+# reconfigure for intltool 0.51 compatibility
+use_autoreconf      yes
+autoreconf.cmd      ./autogen.sh
+autoreconf.args     --copy
+autoreconf.env      NOCONFIGURE=1
+
+# add these dependencies late as changing autoreconf.cmd removes them
+depends_build-append \
+                    port:autoconf \
+                    port:automake \
+                    port:libtool
+
+configure.args      --disable-dependency-tracking \
+                    --disable-silent-rules \
+                    --enable-minimal-flags \
+                    --disable-python \
+                    --disable-lua \
+                    --disable-mmx \
+                    --enable-ipv6 \
+                    --disable-openssl \
+                    --enable-libnotify \
+                    --enable-spell=libsexy \
+                    --enable-socks
+
+post-configure {
+     reinplace "s|-fPIE||g" ${worksrcpath}/Makefile
+     reinplace "s|-fPIE||g" ${worksrcpath}/src/common/Makefile
+# need to do something with backend.m to fix uptime call
+}
+
+
+universal_variant   no
+
+default_variants    +ssl
+
+variant xft conflicts quartz description "Enable Xft2 font support" {
+    configure.args-append --enable-xft
+}
+
+variant ssl description "Enable SSL using openssl" {
+    configure.args-replace --disable-openssl --enable-openssl
+    depends_lib-append path:lib/libssl.dylib:openssl
+}
+
+variant quartz conflicts xft {
+    configure.args-append --disable-xlib
+    depends_lib-append port:gtk-osx-application-gtk2
+    use_autoreconf yes
+}
+
+# python27 has a broken LINKFORSHARED variable, needs to be fixed in the python27 port
+# https://lists.macosforge.org/pipermail/macports-dev/2016-September/033712.html
+#variant python27 description "Enable Python plugin, using python27" conflicts python33 python34 python35 {
+#    configure.args-replace --disable-python --enable-python=python2.7
+#    depends_lib-append port:python27
+#    configure.pkg_config_path ${frameworks_dir}/Python.framework/Versions/2.7/lib/pkgconfig/
+#}
+
+variant python35 description "Enable Python plugin, using python35" conflicts python27 python33 python34 {
+    configure.args-replace --disable-python --enable-python=python3.5
+    depends_lib-append port:python35
+    configure.pkg_config_path ${frameworks_dir}/Python.framework/Versions/3.5/lib/pkgconfig/
+}
+
+livecheck.type  regex
+livecheck.url   http://hexchat.github.io/downloads.html
+livecheck.regex ${name}-(\\d+(\\.\\d+)+)\\.tar
