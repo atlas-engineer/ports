@@ -5,8 +5,9 @@ PortSystem          1.0
 PortGroup           cmake 1.0
 PortGroup           cxx11 1.0
 name                widelands-devel
+conflicts           widelands
 version             build19
-revision            0
+# Hold for later    revision            0
 categories          games
 platforms           darwin
 maintainers         nomaintainer
@@ -21,21 +22,21 @@ long_description    Widelands is an open-source real-time strategy game. It \
                     widelands is heavily inspired by those two games.
 
 homepage            http://wl.widelands.org/
-#master_sites        https://launchpad.net/${name}/${version}/build-18/+download/
+# Hold for later    master_sites        https://launchpad.net/${name}/${version}/build-18/+download/
 
 fetch.type          bzr
 bzr.url             lp:widelands
 
-#use_bzip2           yes
-#distfiles           ${distname}-src${extract.suffix}
-#worksrcdir          ${distname}-src/
-#checksums           rmd160  9af8cf7b8108475bec23ac94c2ac05f4d9a60d67 \
+# Hold for later     use_bzip2           yes
+# Hold for later     distfiles           ${distname}-src${extract.suffix}
+# Hold for later     worksrcdir          ${distname}-src/
+# Hold for later     checksums           rmd160  9af8cf7b8108475bec23ac94c2ac05f4d9a60d67 \
 #                    sha256  6dffd9178f93ff7a9c3c0c9b31b7d3b8eb060c79fbd98901e6311837390b7de3
 
 depends_lib         port:libsdl2 \
                     port:libsdl2_image \
                     port:libsdl2_mixer \
-                    port:libsdl_net \
+                    port:libsdl2_net \
                     port:libsdl2_ttf \
                     port:libsdl_gfx \
                     port:boost \
@@ -44,15 +45,13 @@ depends_lib         port:libsdl2 \
                     port:lua
 
 cmake.out_of_source yes
-#configure.env       LUA_DIR=${prefix}/lib/lua-5.1
-#configure.args      -DLUA_INCLUDE_DIR="${prefix}/include/lua-5.1" -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.app/Contents/MacOS"
 configure.args      -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.app/Contents/MacOS"
 
 
 pre-destroot {
     xinstall -d ${destroot}${applications_dir}/Widelands.app/Contents/Resources \
                 ${destroot}${applications_dir}/Widelands.app/MacOS
-#    file copy ${worksrcpath}/pics/widelands.icns ${destroot}${applications_dir}/Widelands.app/Contents/Resources/widelands.icns
+    file copy ${worksrcpath}/data/images/logos/widelands.icns ${destroot}${applications_dir}/Widelands.app/Contents/Resources/widelands.icns
     set data    " {\n\
                 CFBundleName = widelands;\n\
                 CFBundleDisplayName = Widelands;\n\
