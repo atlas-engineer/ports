@@ -2,14 +2,11 @@
 
 PortSystem              1.0
 PortGroup               github 1.0
-
-# I can't get python portgroup to work right -- it overrides the build commands and scrambles everything up
-#PortGroup               python 1.0
+PortGroup               python 1.0
 
 github.setup            apenwarr sshuttle 29d2e06bf5cd3d575015e23c638ca9e5a10ee29c
 version                 0.61
-checksums               rmd160  dd6d39ae8a6e1c1726b3e576389b7fc323a2ee6f \
-                        sha256  20f9762eadd45cc4f83764b29329a48e685372e33e00e2f00ea40b3b12f39b0c
+name                    sshuttle
 
 categories              net python
 license                 GPL-2
@@ -20,29 +17,24 @@ description             easy to use vpn tunnel over ssh
 long_description    Create a transparent VPN over ssh to a remote network, requiring only python support \
 on the host server. No IPsec, no PPTP, and admin access not required.
 
-supported_archs         noarch
+homepage                https://github.com/apenwarr/sshuttle
 
-# this port requires python27 to be selected as the active python with 
-# 'sudo port select python python27' and 'sudo port select python2 python27'
-# I simply haven't been able to figure out how to do this magically using MacPorts, though
-# so at present, if you want to use this portfile, that's what you'll have to do
+checksums               rmd160  dd6d39ae8a6e1c1726b3e576389b7fc323a2ee6f \
+                        sha256  20f9762eadd45cc4f83764b29329a48e685372e33e00e2f00ea40b3b12f39b0c
 
-pre-fetch {
-ui_msg "This port requires python27 to be selected as the active python with
-'sudo port select python python27' and 'sudo port select python2 python27' 
-I simply haven't been able to figure out how to do this magically using MacPorts, though
-so at present, if you want to use this portfile, that's what you'll have to do."
-}
+python.default_version 27
 
 depends_build           port:py27-markdown \
                         port:py27-beautifulsoup
-pre-build {
-    ui_msg "There is a noticable pause that will occur during the build phase. Do not abort the build. It will ultimately finish correctly."
-}
+
 use_configure           no
 
+# override "make install" as this command doesn't exist in this port
+destroot.cmd            /usr/bin/true
+
+# move the relevant parts into place
 set appname             "Sshuttle VPN.app"
-destroot {
+post-destroot {
             xinstall -d ${destroot}${prefix}/libexec/sshuttle/
             xinstall {*}[glob ${worksrcpath}/*.py] \
                 ${destroot}${prefix}/libexec/sshuttle
@@ -68,9 +60,12 @@ destroot {
 
             ln -sf ${prefix}/libexec/sshuttle/sshuttle \
                 ${destroot}${prefix}/bin/sshuttle
-}
+
+
+
+        }
 
 notes \
-"\n\nWhat now? Try the MacOS GUI in ${applications_dir}/${appname}
+"\n\nWhat now? Try the MacOS GUI in ${applications_dir}/Sshuttle VPN.app
 or run sshuttle: sshuttle --dns -r HOSTNAME 0/0 \
 \nor check the installed documentation with -man sshuttle- "

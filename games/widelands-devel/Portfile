@@ -27,6 +27,10 @@ homepage            http://wl.widelands.org/
 fetch.type          bzr
 bzr.url             lp:widelands
 
+# comment the following out to get the latest revision from the tip of the source tree
+# this command gets the most recent revision as of Oct 7, 2016
+bzr.revision        8119
+
 # Hold for later     use_bzip2           yes
 # Hold for later     distfiles           ${distname}-src${extract.suffix}
 # Hold for later     worksrcdir          ${distname}-src/
@@ -46,6 +50,9 @@ depends_lib         port:libsdl2 \
 
 cmake.out_of_source yes
 configure.args      -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.app/Contents/MacOS"
+
+# for gl debugging. requires a new port, glbinding to be created first
+# configure.args-append     -DOPTION_USE_GLBINDING:BOOL=ON
 
 
 pre-destroot {

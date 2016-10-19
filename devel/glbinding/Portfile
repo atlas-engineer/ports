@@ -1,0 +1,37 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id: Portfile 139308 2015-08-12 02:46:18Z jmr@macports.org $
+
+PortSystem          1.0
+PortGroup           cmake 1.0
+PortGroup           cxx11 1.0
+name                glbinding
+version             2.1.1
+#revision            0
+categories          devel
+platforms           darwin
+maintainers         nomaintainer
+license             GPL-2+
+
+description         openGL support library
+long_description    openGL support library \
+                    openGL support library \
+                    openGL support library \
+                    openGL support library \
+                    openGL support library \
+                    openGL support library.
+
+homepage            http://wl.widelands.org/
+master_sites        https://github.com/cginternals/glbinding/archive/
+distfiles           v${version}${extract.suffix}
+checksums           rmd160  8f0cd849ea78c6461d6157c52160942f10cd279d \
+                    sha256  253671f2b730a6efa55de92a704938bb0f1761d151f3f8e87c043c51d46ea1e4
+
+depends_lib         port:glew \
+                    port:py27-pystache \
+                    port:glfw
+
+cmake.out_of_source yes
+#configure.env       LUA_DIR=${prefix}/lib/lua-5.1
+#configure.args      -DLUA_INCLUDE_DIR="${prefix}/include/lua-5.1" -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.app/Contents/MacOS"
+
+# https://github.com/cginternals/glbinding/archive/v2.1.1.tar.gz

@@ -15,9 +15,9 @@ PortSystem              1.0
 PortGroup               cmake 1.0
 PortGroup               compiler_blacklist_versions 1.0
 
-name                    hatari-devel
+name                    hatari
 version                 1.9.0
-#revision               0
+revision                1
 
 categories              emulators
 license                 GPL-2+
@@ -28,16 +28,10 @@ description             Atari ST/STe/STfm emulator
 long_description        Hatari is an actively developed Atari ST/STe/STfm and Falcon emulator
 homepage                http://hatari.tuxfamily.org/
 
-#master_sites            http://download.tuxfamily.org/hatari/${version}/
-#checksums               sha256  b2b56e6cbe7f8769a5e8b1d96599f392d9351b44cacf959da6905da06d30e992 \
-#                        rmd160  0bc9bd21a81211ebf293911d9aaa5e9cb84c0400
-#use_bzip2               yes
-
-
-fetch.type              hg
-hg.url                  https://hg.tuxfamily.org/mercurialroot/hatari/hatari
-#hg.tag                  f3d8c308e6db
-
+master_sites            http://download.tuxfamily.org/hatari/${version}/
+checksums               sha256  b2b56e6cbe7f8769a5e8b1d96599f392d9351b44cacf959da6905da06d30e992 \
+                        rmd160  0bc9bd21a81211ebf293911d9aaa5e9cb84c0400
+use_bzip2               yes
 
 cmake.out_of_source     yes
 
@@ -68,11 +62,6 @@ platform darwin {
 
 # ensure cmake's choice of compiler is correctly passed in (doesn't always seem to be)
 configure.args-append   -DCMAKE_C_COMPILER=${configure.cc}
-
-
-#disable SLD2 (more 10.6 friendly)
-configure.args-append   -DENABLE_SDL2:BOOL=0
-
 
 # these settings are copied from the previous portfile (1.7 version)
 configure.cflags        -O3 -pipe -fomit-frame-pointer
