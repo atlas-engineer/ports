@@ -2,11 +2,14 @@
 
 PortSystem              1.0
 PortGroup               compiler_blacklist_versions 1.0
+# try cmake
+PortGroup               cmake 1.0
+
 
 name                    libcxxabi
 version                 3.9.0
-#revision                0
-#epoch                   1
+revision                1
+epoch                   1
 categories              lang
 platforms               darwin
 license                 MIT NCSA
@@ -37,10 +40,10 @@ patch.pre_args          -p1
 patchfiles \
     0001-Update-buildit-script-to-read-EXTRA_LDFLAGS-from-the.patch \
     0002-Revert-Make-libc-abi-use-the-implementation-of-__num.patch
-
+    
 variant universal {}
 default_variants +universal
-use_configure no
+#KEN use_configure no
 
 platform darwin {
     if {${os.major} < 9} {
@@ -52,10 +55,21 @@ platform darwin {
 
     if {${os.major} < 11} {
         post-activate {
+            # disable installation for now, until we know if that is actually a good idea or not
             system "cd / && tar xzf ${roots_path}/${root_name}.tgz"
         }
     }
 }
+
+############ TESTING ############
+test.run             yes
+test.cmd             make check-libcxxabi
+test.env             DYLD_LIBRARY_PATH=${worksrcpath}/src/
+
+
+
+
+
 
 variant replacemnt_libcxx description {EXPERTS ONLY: Build a replacement libcxxabi and libcxx even if it is already part of the base OS.} {}
 
@@ -63,7 +77,7 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
     compiler.blacklist *gcc* {clang < 300}
 
     # clang 3.5 and newer are blacklisted to prevent dependency cycles
-    foreach ver {3.5 3.6 3.7 3.8 3.9 devel} {
+    foreach ver {3.5 3.6 3.7 3.8} {
         if {![file exists ${prefix}/bin/clang-mp-${ver}]} {
             compiler.blacklist-append macports-clang-${ver}
         }
@@ -91,22 +105,20 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
             EXTRA_LDFLAGS="${prefix}/lib/libmacho.a ${prefix}/lib/libunwind.a -unexported_symbols_list ${worksrcpath}/unexported_symbols"
     }
 
-    # delete cxa_noexception.cpp as we're not using the cmake build system 
-    # cmake would choose either cxa_exceptions or cxa_noexceptions
-    # but the buildit script just builds every file in the src directory and you can't have both
+    #delete cxa_noexception.cpp as we're not using the cmake build system and the buildit script just builds every file in the src directory
     post-extract {
         system "rm ${worksrcpath}/src/cxa_noexception.cpp"
     }
 
-    build.dir ${worksrcpath}/lib
-    build.cmd ./buildit
-    build.env-append \
-        CC="${configure.cc} ${configure.cppflags}" \
-        CXX="${configure.cxx} ${configure.cppflags}" \
-        RC_XBS=1 \
-        RC_CFLAGS="[get_canonical_archflags]" \
-        RC_ProjectSourceVersion="${version}" \
-        TRIPLE="-apple-darwin${os.major}"
+#    build.dir ${worksrcpath}/lib
+#    build.cmd ./buildit
+#    build.env-append \
+#        CC="${configure.cc} ${configure.cppflags}" \
+#        CXX="${configure.cxx} ${configure.cppflags}" \
+#        RC_XBS=1 \
+#        RC_CFLAGS="[get_canonical_archflags]" \
+#        RC_ProjectSourceVersion="${version}" \
+#        TRIPLE="-apple-darwin${os.major}"
 
     # We want to use the host's libc++abi everywhere because we want to ensure
     # that only *ONE* copy of this library is in any process's address space.
@@ -118,15 +130,16 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
     # runtime.
 
     destroot {
-        xinstall -m 755 -d ${destroot}${roots_path}/${root_name}/usr/lib
-        xinstall -m 755 ${worksrcpath}/lib/libc++abi.dylib ${destroot}${roots_path}/${root_name}/usr/lib
-
-        xinstall -m 755 -d ${destroot}${roots_path}/${root_name}/usr/include
-        xinstall -m 644 ${worksrcpath}/include/__cxxabi_config.h ${destroot}${roots_path}/${root_name}/usr/include
-        xinstall -m 644 ${worksrcpath}/include/cxxabi.h ${destroot}${roots_path}/${root_name}/usr/include
-
-        system "cd ${destroot}${roots_path}/${root_name} && tar czf ../${root_name}.tgz ."
-        file delete -force ${destroot}${roots_path}/${root_name}
+# disable destrooting for now because we need to test this puppy somehow in the build folder
+#        xinstall -m 755 -d ${destroot}${roots_path}/${root_name}/usr/lib
+#        xinstall -m 755 ${worksrcpath}/lib/libc++abi.dylib ${destroot}${roots_path}/${root_name}/usr/lib
+#
+#        xinstall -m 755 -d ${destroot}${roots_path}/${root_name}/usr/include
+#        xinstall -m 644 ${worksrcpath}/include/__cxxabi_config.h ${destroot}${roots_path}/${root_name}/usr/include
+#        xinstall -m 644 ${worksrcpath}/include/cxxabi.h ${destroot}${roots_path}/${root_name}/usr/include
+#
+#        system "cd ${destroot}${roots_path}/${root_name} && tar czf ../${root_name}.tgz ."
+#        file delete -force ${destroot}${roots_path}/${root_name}
     }
 } else {
     distfiles

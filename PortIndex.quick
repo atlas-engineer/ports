@@ -4,6 +4,7 @@ hatari 1185
 hatari-devel 1736
 widelands 2336
 widelands-devel 3156
-libcxxabi 4052
-sshuttle 4936
-webmin 5436
+libcxx 4052
+libcxxabi 5013
+sshuttle 5897
+webmin 6397

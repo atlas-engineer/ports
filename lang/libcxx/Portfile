@@ -1,17 +1,16 @@
-# $Id: Portfile 150880 2016-08-01 08:08:04Z jeremyhu@macports.org $
+# $Id: Portfile 153828 2016-10-12 21:32:06Z jeremyhu@macports.org $
 
 PortSystem              1.0
 PortGroup               compiler_blacklist_versions 1.0
 
-name                    libcxxabi
+name                    libcxx
 version                 3.9.0
-#revision                0
-#epoch                   1
+epoch                   1
 categories              lang
 platforms               darwin
 license                 MIT NCSA
 maintainers             jeremyhu
-description             libc++abi is a new implementation of low level support for a C++ runtime.
+description             libc++ is a new implementation of the C++ standard library with support for C++11 and portions of C++14.
 long_description        ${description} \
                         Because objects cannot be passed between different versions of the C++ runtime, this port must \
                         replace the host version in order to be used.  On Snow Leopard and earlier, this is done \
@@ -19,28 +18,23 @@ long_description        ${description} \
                         users must build the port with +replacemnt_libcxx and install the root manually if they wish \
                         to replace the existing host implementation.
 
-homepage                http://libcxxabi.llvm.org/
+homepage                http://libcxx.llvm.org/
 
 master_sites            http://www.llvm.org/releases/${version}/
 dist_subdir             llvm
- 
+
 use_xz                  yes
 distname                ${name}-${version}.src
 
-checksums               rmd160  44039ed48a78d7e71323fcb1e530798c6a1414e8 \
-                        sha256  b037a92717856882e05df57221e087d7d595a2ae9f170f7bc1a23ec7a92c8019
-
-set roots_path ${prefix}/var/system_roots/
-set root_name  ${name}-${version}-${revision}
-
-patch.pre_args          -p1
-patchfiles \
-    0001-Update-buildit-script-to-read-EXTRA_LDFLAGS-from-the.patch \
-    0002-Revert-Make-libc-abi-use-the-implementation-of-__num.patch
+checksums               rmd160  977a7c44cd29a4ba45d4ea36ac4e9c9a119e259d \
+                        sha256  d0b38d51365c6322f5666a2a8105785f2e114430858de4c25a86b49f227f5b06
 
 variant universal {}
 default_variants +universal
 use_configure no
+
+set roots_path ${prefix}/var/system_roots/
+set root_name  ${name}-${version}-${revision}
 
 platform darwin {
     if {${os.major} < 9} {
@@ -69,6 +63,8 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
         }
     }
 
+    depends_lib port:libcxxabi
+
     supported_archs i386 x86_64 ppc
 
     if {[variant_isset universal] && [lsearch ${universal_archs} ppc] != -1} {
@@ -76,42 +72,28 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
         compiler.whitelist macports-clang-3.6
     }
 
-    if {${os.major} < 10} {
-        depends_build-append \
-            port:libunwind \
-            port:libmacho
-
-        pre-build {
-            system "nm -g ${prefix}/lib/libmacho.a 2> /dev/null | grep ' \[DST\] ' | awk '{print \$3}' > ${worksrcpath}/unexported_symbols_macho"
-            system "nm -g ${prefix}/lib/libunwind.a 2> /dev/null | grep ' \[DST\] ' | awk '{print \$3}' | grep -v '^__Unwind' > ${worksrcpath}/unexported_symbols_unwind"
-            system "cat ${worksrcpath}/unexported_symbols_macho ${worksrcpath}/unexported_symbols_unwind > ${worksrcpath}/unexported_symbols"
-        }
-
-        build.env-append \
-            EXTRA_LDFLAGS="${prefix}/lib/libmacho.a ${prefix}/lib/libunwind.a -unexported_symbols_list ${worksrcpath}/unexported_symbols"
-    }
-
-    # delete cxa_noexception.cpp as we're not using the cmake build system 
-    # cmake would choose either cxa_exceptions or cxa_noexceptions
-    # but the buildit script just builds every file in the src directory and you can't have both
-    post-extract {
-        system "rm ${worksrcpath}/src/cxa_noexception.cpp"
-    }
+    patch.pre_args -p1
+    patchfiles-append \
+        0001-buildit-build-fix-for-Leopard.patch \
+        0002-buildit-Set-compatibility-version-to-RC_ProjectSourc.patch \
+        0003-Fix-local-and-iterator-when-building-with-Lion-and-n.patch \
+        0004-implement-atomic-using-mutex-lock_guard-for-64b-ops-.patch 
+#        0005-string-Fix-exception-declaration.patch
 
     build.dir ${worksrcpath}/lib
     build.cmd ./buildit
     build.env-append \
-        CC="${configure.cc} ${configure.cppflags}" \
-        CXX="${configure.cxx} ${configure.cppflags}" \
+        CC="${configure.cc}" \
+        CXX="${configure.cxx}" \
         RC_XBS=1 \
-        RC_CFLAGS="[get_canonical_archflags]" \
         RC_ProjectSourceVersion="${version}" \
+        RC_CFLAGS="[get_canonical_archflags]" \
         TRIPLE="-apple-darwin${os.major}"
 
-    # We want to use the host's libc++abi everywhere because we want to ensure
+    # We want to use the host's libc++ everywhere because we want to ensure
     # that only *ONE* copy of this library is in any process's address space.
-    # On Snow Leopard, this port provides this library in /usr for binary
-    # compatibility with Lion and later.
+    # On Snow Leopard and earlier, this port provides this library in /usr for
+    # binary compatibility with Lion and later.
     #
     # On newer OS version, this port does not install the content to /usr and
     # just leaves it to expert users who may want to replace their system
@@ -119,18 +101,14 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
 
     destroot {
         xinstall -m 755 -d ${destroot}${roots_path}/${root_name}/usr/lib
-        xinstall -m 755 ${worksrcpath}/lib/libc++abi.dylib ${destroot}${roots_path}/${root_name}/usr/lib
-
-        xinstall -m 755 -d ${destroot}${roots_path}/${root_name}/usr/include
-        xinstall -m 644 ${worksrcpath}/include/__cxxabi_config.h ${destroot}${roots_path}/${root_name}/usr/include
-        xinstall -m 644 ${worksrcpath}/include/cxxabi.h ${destroot}${roots_path}/${root_name}/usr/include
+        xinstall -m 755 ${worksrcpath}/lib/libc++.1.dylib ${destroot}${roots_path}/${root_name}/usr/lib
+        ln -s libc++.1.dylib ${destroot}${roots_path}/${root_name}/usr/lib/libc++.dylib
 
         system "cd ${destroot}${roots_path}/${root_name} && tar czf ../${root_name}.tgz ."
         file delete -force ${destroot}${roots_path}/${root_name}
     }
 } else {
     distfiles
-    patchfiles
     fetch {}
     build {}
     destroot {
