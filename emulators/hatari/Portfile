@@ -1,38 +1,23 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
-# $Id: Portfile 153175 2016-09-26 08:58:52Z ryandesign@macports.org $
-
-# tested on 10.4 PPC/Intel, 10.5 PPC/Intel, 10.6, 10.6 with LibCxx upgrade, 10.7, 10.11
-# hatari command line builds on all systems
-# hatari python UI not needed with macOS GUI or command line versions - has unspecified python version so not included
-# hatari macOS GUI builds on >= 10.6 as NSWindowDelegate is used and is only 10.6 onwards
-# hatari macOS GUI does not build with gcc*,  llvm-gcc-4.2, or older clang versions
-# winuae works on all with gcc flag modification below. 
-# SDL2 works on 10.6, 10.7 and 10.11, and likely all in between, but not 10.5
-
-# revision 1            add portaudio dependency, add post-destroot to install default tos.img into app bundle, update clang requirements
 
 PortSystem              1.0
 PortGroup               cmake 1.0
 PortGroup               compiler_blacklist_versions 1.0
 
 name                    hatari
-version                 1.9.0
-revision                1
-
+version                 2.0.0
 categories              emulators
 license                 GPL-2+
 platforms               darwin
-maintainers             slor.net:james gmail.com:ken.cunningham.webuse openmaintainer
 
+maintainers             slor.net:james gmail.com:ken.cunningham.webuse openmaintainer
 description             Atari ST/STe/STfm emulator
 long_description        Hatari is an actively developed Atari ST/STe/STfm and Falcon emulator
 homepage                http://hatari.tuxfamily.org/
-
 master_sites            http://download.tuxfamily.org/hatari/${version}/
-checksums               sha256  b2b56e6cbe7f8769a5e8b1d96599f392d9351b44cacf959da6905da06d30e992 \
-                        rmd160  0bc9bd21a81211ebf293911d9aaa5e9cb84c0400
+checksums               sha256  52a447a59b6979d55d1525f3c4a21ec013e4371354d6683ede71546c5e6da577 \
+                        rmd160  5277b0b9ffc65b7e604669498408f68e5da5ce77
 use_bzip2               yes
-
 cmake.out_of_source     yes
 
 depends_lib             port:libsdl \
@@ -49,17 +34,6 @@ post-patch {
     reinplace "s|add_subdirectory(python-ui)||g" ${worksrcpath}/CMakeLists.txt
 }
 
-# default to install macOS GUI application, and then adjust for OS variations
-platform darwin {
-    if { ${os.major} <= 9 } {
-        # 10.4 and 10.5 cannot build the macOS GUI, even with newer clang versions.
-        default_variants       +commandlineapp
-    } else {
-        # *gcc* and older clang versions will not build the macOS GUI, so blacklist on 10.6+
-        compiler.blacklist     *gcc* { clang < 211 }
-    }
-}
-
 # ensure cmake's choice of compiler is correctly passed in (doesn't always seem to be)
 configure.args-append   -DCMAKE_C_COMPILER=${configure.cc}
 
@@ -67,38 +41,44 @@ configure.args-append   -DCMAKE_C_COMPILER=${configure.cc}
 configure.cflags        -O3 -pipe -fomit-frame-pointer
 configure.universal_args-delete --disable-dependency-tracking
 
-variant commandlineapp description "Install command line version only" {
-    # we're bypassing the configure script in this portfile by using the cmake portgroup, so set these directly in cmake
-    configure.args-append   -DENABLE_OSX_BUNDLE:BOOL=0
-}
-
-variant winuae description "Enable WinUAE CPU core (experimental)" {
-    # we're bypassing the configure script in this portfile by using the cmake portgroup, so set these directly in cmake
-    configure.args-append  -DENABLE_WINUAE_CPU:BOOL=1
-}
 
 platform darwin {
-    if { ${os.major} >= 10 } {
-        variant sdl2 description "Use SDL2" {
-            configure.args-append  -DENABLE_SDL2:BOOL=1
-            depends_lib-delete     port:libsdl
-            depends_lib-append     port:libsdl2
-        }
+    # for portfile logic, default to command line (SDL GUI) app and sdl version 1
+    configure.args-append    -DENABLE_OSX_BUNDLE:BOOL=0
+    configure.args-append    -DENABLE_SDL2:BOOL=0
+
+    # 10.6 or greater should build with libsdl2
+    if { ${os.major} > 9 } {
+        default_variants    +sdl2
+    }
+
+    # 10.7 or greater should build macOS GUI
+    if { ${os.major} > 10 } {
+        default_variants    +macOSGUI
     }
 }
 
-if {![variant_isset commandlineapp]} {
-    # copy the included default tos.img into the app bundle if building the macOS GUI version
+variant macOSGUI description "Build macOS GUI Application (10.7+)" {
+    compiler.blacklist     *gcc* { clang < 211 }
+    configure.args-append   -DENABLE_OSX_BUNDLE:BOOL=1
     post-destroot {
         copy ${worksrcpath}/src/tos.img ${destroot}${applications_dir}/hatari.app/Contents/Resources/tos.img
     }
 }
 
+variant sdl2 description "Use SDL 2.0 instead of SDL 1.2 (10.6+)" {
+    configure.args-append  -DENABLE_SDL2:BOOL=1
+    depends_lib-replace     port:libsdl port:libsdl2
+}
 
 notes "
+A free Atari-compatible ROM, EmuTOS, is installed with this port.
+
+    http://sourceforge.net/projects/emutos
+
 An online manual has been installed at
 
     file://${prefix}/share/doc/hatari/manual.html
 
-and can be accessed via the Help menu in the macOS application.
+and can be accessed via the Help menu in the macOS GUI application.
 "
