@@ -1,0 +1,49 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem              1.0
+name                    libcapsimage
+version                 4.2.0
+categories              devel
+license                 GPL-2+
+platforms               darwin
+
+maintainers             gmail.com:ken.cunningham.webuse openmaintainer
+description             Disk image library support
+long_description        Disk image library support
+homepage                http://www.softpres.org
+master_sites            http://www.softpres.org/_media/files:ipflib42_macosx-universal.dmg.zip?id=download&cache=cache
+checksums               sha256  a3bb22c8dab474273b51cf3c67279cfd94ec7cadfe14cc81821db5c840183212 \
+                        rmd160  89888f817a1c6495edca694d7ef5a92bc676036c
+                        
+use_zip                 yes
+
+post-extract {
+
+    system -W ${workpath} "hdiutil attach universal-macosx-capsimage.dmg -noverify"
+#    system -W ${workpath} "hdiutil detach universal-macosx-capsimage.dmg"
+}
+
+use_configure           no
+build {}
+
+destroot.asroot         yes
+destroot {
+
+#    system -W ${workpath} "hdiutil attach universal-macosx-capsimage.dmg -readonly -noverify"
+
+    xinstall -d ${destroot}${prefix}/include/caps/
+    #xinstall {*}[glob /Volumes/universal-macosx-capsimage/include/caps/*.h] \
+                $${destroot}${prefix}/include/caps
+    
+    copy /Volumes/universal-macosx-capsimage/include/caps/capsimage.h ${destroot}${prefix}/include/caps
+    copy /Volumes/universal-macosx-capsimage/include/caps/fdc.h ${destroot}${prefix}/include/caps
+    copy /Volumes/universal-macosx-capsimage/include/caps/form.h ${destroot}${prefix}/include/caps
+    copy /Volumes/universal-macosx-capsimage/CAPSImage.framework ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework
+    system "chown -R root:admin ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework"
+    system "chmod -R 644 ${destroot}${prefix}/include/caps"
+    system "install_name_tool -id ${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage \
+            ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage"
+
+
+    system -W ${workpath} "hdiutil detach /Volumes/universal-macosx-capsimage"
+}

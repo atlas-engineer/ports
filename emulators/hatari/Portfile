@@ -3,7 +3,6 @@
 PortSystem              1.0
 PortGroup               cmake 1.0
 PortGroup               compiler_blacklist_versions 1.0
-
 name                    hatari
 version                 2.0.0
 categories              emulators
@@ -42,6 +41,23 @@ configure.cflags        -O3 -pipe -fomit-frame-pointer
 configure.universal_args-delete --disable-dependency-tracking
 
 
+# the CAPSImage library can be included, but at present there are manual steps that will need to be done for this to work
+# 1. download the dmg from here <http://www.softpres.org/_media/files:ipflib42_macosx-universal.dmg.zip?id=download&cache=cache>
+# 2. move the framework and include files into the proper locations indicated below
+# 3. change ownership and permissions on the include files and library appropriately
+#     a) sudo chown -R root:admin ${prefix}/Library/Frameworks/CAPSImage.framework
+#     b) sudo chmod -R 644 ${prefix}/include/cap
+# 4. update the install name of the library, like below
+#     a) "sudo install_name_tool -id ${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage \
+            ${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage"
+
+set capsimage_framework ${prefix}/Library/Frameworks/capsimage.framework
+if {[file exists $capsimage_framework]} {
+    configure.args-append   -DCAPSIMAGE_INCLUDE_DIR:PATH=${prefix}/include/cap
+    configure.args-append   -DCAPSIMAGE_LIBRARY:FILEPATH=${prefix}/Library/Frameworks/capsimage.framework
+}
+
+
 platform darwin {
     # for portfile logic, default to command line (SDL GUI) app and sdl version 1
     configure.args-append    -DENABLE_OSX_BUNDLE:BOOL=0
@@ -52,13 +68,13 @@ platform darwin {
         default_variants    +sdl2
     }
 
-    # 10.7 or greater should build macOS GUI
-    if { ${os.major} > 10 } {
+    # 10.9 or greater should build macOS GUI
+    if { ${os.major} > 12 } {
         default_variants    +macOSGUI
     }
 }
 
-variant macOSGUI description "Build macOS GUI Application (10.7+)" {
+variant macOSGUI description "Build macOS GUI Application (10.9+)" {
     compiler.blacklist     *gcc* { clang < 211 }
     configure.args-append   -DENABLE_OSX_BUNDLE:BOOL=1
     post-destroot {
