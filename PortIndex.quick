@@ -1,19 +1,9 @@
 glbinding 0
-<<<<<<< HEAD
 libcapsimage 521
 basiliskii 907
-hatari 1571
-hatari-devel 2110
-widelands 2710
-widelands-devel 3530
-sshuttle 4426
-webmin 4926
-=======
-basiliskii 521
-hatari 1185
-hatari-devel 1707
-widelands 2307
-widelands-devel 3126
-sshuttle 4022
-webmin 4522
->>>>>>> 7f77f6258191c092653255753411cb2100278f39
+hatari 1600
+hatari-devel 2139
+widelands 2739
+widelands-devel 3624
+sshuttle 4520
+webmin 5020

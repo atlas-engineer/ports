@@ -68,11 +68,7 @@ platform darwin {
         default_variants    +sdl2
     }
 
-<<<<<<< HEAD
-    # 10.9 or greater should build macOS GUI
-=======
     # 10.9 or greater can build macOS GUI
->>>>>>> 7f77f6258191c092653255753411cb2100278f39
     if { ${os.major} > 12 } {
         default_variants    +macOSGUI
     }
