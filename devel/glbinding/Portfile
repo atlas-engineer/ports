@@ -33,12 +33,17 @@ pre-fetch {
 	}
 }
 
-depends_build       port:cmake
-
+depends_build       port:cmake \
+                    port:py-pystache
+                    
 depends_lib         port:glew \
-                    port:py27-pystache \
-                    port:glfw \
+                    port:glfw
                     
                     
 cmake.out_of_source yes
 patchfiles-append patch-glbinding-cmake-installdirs.diff
+
+variant docs description "install documentation" {
+    configure.args-append "-DOPTION_BUILD_DOCS:BOOL=ON"
+    depends_build-append port:doxygen
+}
