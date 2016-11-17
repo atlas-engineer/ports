@@ -43,22 +43,22 @@ configure.universal_args-delete --disable-dependency-tracking
 
 
 platform darwin {
-    # for portfile logic, default to command line (SDL GUI) app and sdl version 1
+    # default to command line (SDL GUI) app and sdl version 1
     configure.args-append    -DENABLE_OSX_BUNDLE:BOOL=0
     configure.args-append    -DENABLE_SDL2:BOOL=0
 
-    # 10.6 or greater should build with libsdl2
+    # 10.6 or greater can build with libsdl2
     if { ${os.major} > 9 } {
         default_variants    +sdl2
     }
 
-    # 10.7 or greater should build macOS GUI
-    if { ${os.major} > 10 } {
+    # 10.9 or greater can build macOS GUI
+    if { ${os.major} > 12 } {
         default_variants    +macOSGUI
     }
 }
 
-variant macOSGUI description "Build macOS GUI Application (10.7+)" {
+variant macOSGUI description "Build macOS GUI Application (10.9+)" {
     compiler.blacklist     *gcc* { clang < 211 }
     configure.args-append   -DENABLE_OSX_BUNDLE:BOOL=1
     post-destroot {
