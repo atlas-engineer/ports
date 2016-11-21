@@ -3,9 +3,8 @@
 PortSystem          1.0
 PortGroup           cmake 1.0
 PortGroup           cxx11 1.0
-PortGroup           github 1.0
-
-github.setup        cginternals glbinding 2.1.1 v
+name                glbinding
+version             2.1.1
 categories          devel
 platforms           darwin
 maintainers         gmail.com:ken.cunningham.webuse openmaintainer
@@ -21,30 +20,30 @@ long_description    glbinding leverages modern C++11 features like enum classes,
                     your projects. Based on the OpenGL API specification (gl.xml) glbinding is \
                     generated using python scripts and templates that can be easily adapted to fit custom needs.
 
-checksums           rmd160  1c95c08d50d0e14c890d890fbfb1d0c612c16562 \
-                    sha256  2ce7d20d92703a855ce2ccf1f349d6721c0d9d8aab9da42aa303f0831290f77c
+homepage            https://www.cginternals.com/
+master_sites        https://github.com/cginternals/glbinding/archive/
+distfiles           v${version}${extract.suffix}
+checksums           rmd160  8f0cd849ea78c6461d6157c52160942f10cd279d \
+                    sha256  253671f2b730a6efa55de92a704938bb0f1761d151f3f8e87c043c51d46ea1e4
                     
 pre-fetch {
-    if {${os.platform} eq "darwin" && ${os.major} < 13} {
-        ui_error "Presently requires OS X 10.9 or later (requires Thread-Local Storage)"
-        return -code error "incompatible Mac operating system version"
-    }
+	if {${os.platform} eq "darwin" && ${os.major} < 13} {
+		ui_error "Presently requires MacOSX 10.9 or later (requires Thread-Local Storage)"
+		error Incompatible_OS_Version
+	}
 }
 
-depends_build-append port:py27-pystache \
-                     port:glfw
-
-configure.args-append "-DPYTHON_EXECUTABLE:FILEPATH=${prefix}/bin/python2.7"
+depends_build       port:cmake \
+                    port:py-pystache
+                    
+depends_lib         port:glew \
+                    port:glfw
+                    
+                    
 cmake.out_of_source yes
 patchfiles-append patch-glbinding-cmake-installdirs.diff
 
 variant docs description "install documentation" {
     configure.args-append "-DOPTION_BUILD_DOCS:BOOL=ON"
     depends_build-append port:doxygen
-}
-
-variant examples description "install examples" {
-    configure.args-append "-DOPTION_BUILD_EXAMPLES:BOOL=ON"
-    depends_build-append port:glew \
-                         port:cpplocate
 }

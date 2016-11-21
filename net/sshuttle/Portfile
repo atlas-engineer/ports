@@ -1,76 +1,46 @@
-# $Id: Portfile 135117 2015-04-15 19:51:30Z ryandesign@macports.org $
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-PortSystem              1.0
-PortGroup               github 1.0
+PortSystem          1.0
+PortGroup           python 1.0
+categories          net
+name                sshuttle
+version             0.78.1
+platforms           darwin
+license             GPL-2
+maintainers         nomaintainer
 
-# I can't get python portgroup to work right -- it overrides the build commands and scrambles everything up
-#PortGroup               python 1.0
-
-github.setup            apenwarr sshuttle 29d2e06bf5cd3d575015e23c638ca9e5a10ee29c
-version                 0.61
-checksums               rmd160  dd6d39ae8a6e1c1726b3e576389b7fc323a2ee6f \
-                        sha256  20f9762eadd45cc4f83764b29329a48e685372e33e00e2f00ea40b3b12f39b0c
-
-categories              net python
-license                 GPL-2
-platforms               darwin
-maintainers             nomaintainer
-description             easy to use vpn tunnel over ssh
-
+description         Full featured VPN over an SSH tunnel
 long_description    Create a transparent VPN over ssh to a remote network, requiring only python support \
-on the host server. No IPsec, no PPTP, and admin access not required.
+                    on the host server. No IPsec, no PPTP, and admin access not required.
 
-supported_archs         noarch
+homepage            https://github.com/sshuttle/sshuttle
+master_sites        https://pypi.python.org/packages/48/be/c1c9ead0c38383c4b2a192de4679f09413ddc6701988ca56bd220c64ec50
+distname            sshuttle-${version}
 
-# this port requires python27 to be selected as the active python with 
-# 'sudo port select python python27' and 'sudo port select python2 python27'
-# I simply haven't been able to figure out how to do this magically using MacPorts, though
-# so at present, if you want to use this portfile, that's what you'll have to do
+checksums           md5     3b792dc650c99ce6e8bbeae6d5f1179e \
+                    rmd160  444454b5332037d2fd123399d2422985f176337f \
+                    sha256  03a71648ce476de06a075bd9a972492d494b414ae51304bf535b80ff22be2d3c
 
-pre-fetch {
-ui_msg "This port requires python27 to be selected as the active python with
-'sudo port select python python27' and 'sudo port select python2 python27' 
-I simply haven't been able to figure out how to do this magically using MacPorts, though
-so at present, if you want to use this portfile, that's what you'll have to do."
+python.versions     27 34 35
+
+if {${name} ne ${subport}} {
+    depends_build-append \
+                        port:py${python.version}-setuptools \ 
+                        port:py${python.version}-sphinx
+
+    livecheck.type      none
+} else {
+    livecheck.type      pypi
 }
 
-depends_build           port:py27-markdown \
-                        port:py27-beautifulsoup
-pre-build {
-    ui_msg "There is a noticable pause that will occur during the build phase. Do not abort the build. It will ultimately finish correctly."
-}
-use_configure           no
 
-set appname             "Sshuttle VPN.app"
-destroot {
-            xinstall -d ${destroot}${prefix}/libexec/sshuttle/
-            xinstall {*}[glob ${worksrcpath}/*.py] \
-                ${destroot}${prefix}/libexec/sshuttle
-
-            xinstall -d ${destroot}${prefix}/libexec/sshuttle/compat/
-            xinstall {*}[glob ${worksrcpath}/compat/*.py] \
-                ${destroot}${prefix}/libexec/sshuttle/compat
-
-            xinstall -d ${destroot}${prefix}/libexec/sshuttle/version/
-            xinstall {*}[glob ${worksrcpath}/version/*.py] \
-                ${destroot}${prefix}/libexec/sshuttle/version
-
+post-destroot {
             xinstall -d ${destroot}${prefix}/share/doc/sshuttle/
-            xinstall ${worksrcpath}/Documentation/sshuttle.md \
+            xinstall -d ${destroot}${prefix}/share/doc/sshuttle/man/
+            xinstall {*}[glob ${worksrcpath}/docs/*.rst] \
+                ${destroot}${prefix}/share/doc/sshuttle/
+            xinstall {*}[glob ${worksrcpath}/docs/*.py] \
                 ${destroot}${prefix}/share/doc/sshuttle/
 
-            xinstall ${worksrcpath}/Documentation/sshuttle.8 ${destroot}${prefix}/share/man/man8/
-
-            xinstall ${worksrcpath}/sshuttle \
-                ${destroot}${prefix}/libexec/sshuttle
-
-            copy ${worksrcpath}/ui-macos/${appname} ${destroot}${applications_dir}
-
-            ln -sf ${prefix}/libexec/sshuttle/sshuttle \
-                ${destroot}${prefix}/bin/sshuttle
+             system "sphinx-build -b man ${destroot}${prefix}/share/doc/sshuttle ${destroot}${prefix}/share/doc/sshuttle/man"
 }
-
-notes \
-"\n\nWhat now? Try the MacOS GUI in ${applications_dir}/${appname}
-or run sshuttle: sshuttle --dns -r HOSTNAME 0/0 \
-\nor check the installed documentation with -man sshuttle- "
