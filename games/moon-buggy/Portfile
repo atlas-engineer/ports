@@ -1,0 +1,36 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem              1.0
+
+name                    moon-buggy
+version                 1.0
+categories              games
+platforms               darwin
+
+maintainers             gmail.com:ken.cunningham.webuse openmaintainer
+description             Drive a car across the moon, jump craters
+long_description        Moon-buggy is a simple character graphics game, where you drive some kind \
+                        of car across the moon's surface. Unfortunately there are dangerous \
+                        craters there.  Fortunately your car can jump over them!
+license                 GPL-2+
+
+homepage                http://www.seehuhn.de/pages/moon-buggy
+master_sites            http://m.seehuhn.de/programs/
+
+checksums               rmd160  42c00d854c7a1b19f64721f124942ae73c62a01f \
+                        sha256  f8296f3fabd93aa0f83c247fbad7759effc49eba6ab5fdd7992f603d2d78e51a
+
+# patch makefile to prevent test-running program as root during install (fails)                    
+post-extract {
+    patchfiles-append   patch-moon-buggy-makefile-am.diff
+}
+
+depends_lib             port:ncurses
+
+use_autoreconf          yes
+
+configure.args-append   --prefix=${prefix}
+configure.args-append   --mandir=${prefix}/share/man
+configure.args-append   --infodir=${prefix}/share/info
+configure.args-append   --sharedstatedir=${prefix}/var/games
+     
