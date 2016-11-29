@@ -27,5 +27,4 @@ use_autoreconf          yes
 configure.args-append   --prefix=${prefix}
 configure.args-append   --mandir=${prefix}/share/man
 configure.args-append   --infodir=${prefix}/share/info
-configure.args-append   --sharedstatedir=${prefix}/var/games
      
