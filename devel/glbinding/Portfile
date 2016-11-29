@@ -34,17 +34,17 @@ pre-fetch {
 depends_build-append port:py27-pystache \
                      port:glfw
 
-configure.args-append "-DPYTHON_EXECUTABLE:FILEPATH=${prefix}/bin/python2.7"
+configure.args-append -DPYTHON_EXECUTABLE:FILEPATH=${prefix}/bin/python2.7
 cmake.out_of_source yes
 patchfiles-append patch-glbinding-cmake-installdirs.diff
 
 variant docs description "install documentation" {
-    configure.args-append "-DOPTION_BUILD_DOCS:BOOL=ON"
+    configure.args-append -DOPTION_BUILD_DOCS:BOOL=ON
     depends_build-append port:doxygen
 }
 
 variant examples description "install examples" {
-    configure.args-append "-DOPTION_BUILD_EXAMPLES:BOOL=ON"
+    configure.args-append -DOPTION_BUILD_EXAMPLES:BOOL=ON
     depends_build-append port:glew \
                          port:cpplocate
 }
