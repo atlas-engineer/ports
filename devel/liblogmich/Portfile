@@ -16,6 +16,8 @@ long_description        liblogmich is a trivial logging library for C++. It lack
 checksums               rmd160  076ad5d0c0846ca3ca9f035e0c2b3431bbab2a19 \
                         sha256  737892b72a770333a54eb015e947185bc327d9d9b22971bcadd67bab08bf419f
 
+depends_lib             port:boost
+
 post-extract {
     copy ${filespath}/CMakeLists.txt ${worksrcpath}/CMakeLists.txt
 }
