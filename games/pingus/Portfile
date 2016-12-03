@@ -5,29 +5,38 @@ PortGroup           cmake 1.0
 PortGroup           cxx11 1.0
 PortGroup           github 1.0
 
+# there are no releases - this hash corresponds to the version date
 github.setup        Pingus pingus d34b61f414ed4f264c22e37c98e1a1185c96eda4
 version             20161019
+
+# and these checksums are correct for the tarball version, however see below
+checksums           rmd160  8cc4920e9298aa3a47de009b24c6f1ba6859a454 \
+                    sha256  7de6607c189f68f60e74cfd86c12acc68837914a6ae2fd37ba1319719ff4c20b
+
 categories          games
 platforms           darwin
 maintainers         gmail.com:ken.cunningham.webuse openmaintainer
 license             MIT
 
-description         Cross-platform C++ library providing tools for applications to locate themselves, their data assets as well as dependend modules.
-long_description    cpplocate is an MIT licensed, cross-platform C++ library that provides tools for applications to locate themselves, their data assets, as well as dependend modules.
+description         A free Lemmings(tm) clone using SDL2. 
+long_description    ${description} It is a puzzle game where the player has to guide a group of penguins to safety.
 
-checksums           rmd160  8cc4920e9298aa3a47de009b24c6f1ba6859a454 \
-                    sha256  7de6607c189f68f60e74cfd86c12acc68837914a6ae2fd37ba1319719ff4c20b
-                    
-#configure.args-append "-DBUILD_SHARED_LIBS:BOOL=ON"
+# to be able to get the submodules, unfortunately at present we need to use a git fetch rather than a tarball fetch
+fetch.type          git                    
+
+# and then get the submodules
+post-extract {
+    system -W ${worksrcpath} "git submodule update --init"
+}
+
+depends_lib         port:boost \
+                    port:libiconv \
+                    port:libsdl2 \
+                    port:libsdl2_image \
+                    port:libsdl2_mixer \
+                    port:libpng \
+                    port:jsoncpp
+
+# a few libraries are not included automatically by the cmake build file
+configure.ldflags-append "-liconv -framework CoreFoundation"
 cmake.out_of_source yes
-
-#patchfiles-append patch-cpplocate-cmake-installdirs.diff
-
-#variant docs description "install documentation" {
-#     configure.args-append "-DOPTION_BUILD_DOCS:BOOL=ON"
-#     depends_build-append port:doxygen
-#}
-
-# sexp   => py27-sexpdata
-# tinygettext => gettext
-

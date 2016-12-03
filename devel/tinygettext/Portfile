@@ -6,7 +6,6 @@ PortGroup               cmake 1.0
 
 github.setup            tinygettext tinygettext bf66a570a01d0251c90f4ee40f979ad6aca7eb1a
 version                 20160722
-#name                    liblogmich
 license                 zlib
 categories              devel
 platforms               darwin
@@ -21,12 +20,6 @@ checksums               rmd160  cd6a2d9a6d848ea06677faea85793ed1dc696148 \
                         
 depends_lib             port:libiconv
 
-cmake.out_of_source     yes
-# configure.args-append  -DICONV_INCLUDE_DIR:PATH=${prefix}/include
-# configure.args-append  -DICONV_LIBRARY:PATH=${prefix}/lib/libiconv.dylib
-
 configure.ldflags-append "-liconv"
+cmake.out_of_source     yes
 
-# variant testapp description "install test application" {
-#     configure.args-append -DOPTION_INSTALL_TEST_APP:BOOL=ON
-# }
