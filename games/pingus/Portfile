@@ -2,29 +2,18 @@
 
 PortSystem          1.0
 PortGroup           cmake 1.0
-PortGroup           cxx11 1.0
 PortGroup           github 1.0
-
-# there are no releases - this hash corresponds to the version date
-github.setup        Pingus pingus d34b61f414ed4f264c22e37c98e1a1185c96eda4
-version             20161019
-
-# and these checksums are correct for the tarball version, however see below
-checksums           rmd160  8cc4920e9298aa3a47de009b24c6f1ba6859a454 \
-                    sha256  7de6607c189f68f60e74cfd86c12acc68837914a6ae2fd37ba1319719ff4c20b
-
+github.setup        pingus pingus d34b61f414ed4f264c22e37c98e1a1185c96eda4
+version             0.8.0-20161019
 categories          games
 platforms           darwin
 maintainers         gmail.com:ken.cunningham.webuse openmaintainer
-license             MIT
+license             GPL-3
 
 description         A free Lemmings(tm) clone using SDL2. 
 long_description    ${description} It is a puzzle game where the player has to guide a group of penguins to safety.
 
-# to be able to get the submodules, unfortunately at present we need to use a git fetch rather than a tarball fetch
 fetch.type          git                    
-
-# and then get the submodules
 post-extract {
     system -W ${worksrcpath} "git submodule update --init"
 }
@@ -37,6 +26,19 @@ depends_lib         port:boost \
                     port:libpng \
                     port:jsoncpp
 
-# a few libraries are not included automatically by the cmake build file
 configure.ldflags-append "-liconv -framework CoreFoundation"
 cmake.out_of_source yes
+
+configure.args      -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Pingus.app/Contents/MacOS"
+
+pre-destroot {
+    xinstall -d ${destroot}${applications_dir}/Pingus.app/Contents/Resources \
+                ${destroot}${applications_dir}/Pingus.app/MacOS
+    file copy ${worksrcpath}/data/images/icons/pingus-icon.icns ${destroot}${applications_dir}/Pingus.app/Contents/Resources/pingus.icns
+    file copy ${worksrcpath}/Info.plist "${destroot}${applications_dir}/Pingus.app/Contents/Info.plist"
+}
+
+post-destroot {
+    file copy ${destroot}${applications_dir}/Pingus.app/Contents/MacOS/bin/pingus ${destroot}${applications_dir}/Pingus.app/Contents/MacOS/pingus
+    reinplace "s|\"$@\"||g" ${destroot}${applications_dir}/Pingus.app/Contents/MacOS/pingus
+}
