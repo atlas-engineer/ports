@@ -1,0 +1,40 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem              1.0
+PortGroup               xcode 1.0
+name                    irrlicht
+version                 1.8.4
+categories              devel
+license                 zlib
+platforms               darwin macosx
+
+maintainers             gmail.com:ken.cunningham.webuse openmaintainer
+description             lightening fast realtime 3D game engine
+long_description        ${description}
+homepage                http://irrlicht.sourceforge.net/
+
+master_sites            https://downloads.sourceforge.net/irrlicht/
+checksums               sha256  f42b280bc608e545b820206fe2a999c55f290de5c7509a02bdbeeccc1bf9e433 \
+                        rmd160  275eb79193a330b3924166e9cac8d74d37990256
+use_zip                 yes
+
+# one patch to fix an errant typecast in one file
+patchfiles-append       patch-irrlicht-cirrdevice.diff
+
+xcode.project           ${worksrcpath}/source/Irrlicht/MacOSX/MacOSX.xcodeproj
+xcode.configuration     Release
+xcode.build.settings    SYMROOT=build
+
+# build framework
+xcode.destroot.type     framework
+xcode.target            IrrFramework
+
+
+# build static library
+#xcode.target            libIrrlicht.a
+# destroot {
+#     copy ${worksrcpath}/source/Irrlicht/MacOSX/build/Release/libIrrlicht.a ${destroot}${prefix}/lib/libIrrlicht.a
+#     xinstall -d ${destroot}${prefix}/include/irrlicht/
+#     xinstall {*}[glob ${worksrcpath}/include/*.h] \
+#                 ${destroot}${prefix}/include/irrlicht
+# }
