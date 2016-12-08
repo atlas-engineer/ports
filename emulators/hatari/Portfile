@@ -24,37 +24,27 @@ depends_lib             port:libsdl \
                         port:readline \
                         port:portaudio
 
-# 1. fix hard-coded installation directory for macOS bundle
+# 1. fix hard-coded installation directory for mac bundle
 # 2. delete warning flag in winuae emulator code not supported by GCC42
-# 3. disable python ui - not needed for macOS
+# 3. disable python ui - not needed for mac
 post-patch {
     reinplace "s|/Applications|${applications_dir}|g" ${worksrcpath}/src/CMakeLists.txt
     reinplace "s|-Wno-maybe-uninitialized||g" ${worksrcpath}/src/cpu/CMakeLists.txt
     reinplace "s|add_subdirectory(python-ui)||g" ${worksrcpath}/CMakeLists.txt
 }
 
-# ensure cmake's choice of compiler is correctly passed in (doesn't always seem to be)
-configure.args-append   -DCMAKE_C_COMPILER=${configure.cc}
-
 # these settings are copied from the previous portfile (1.7 version)
 configure.cflags        -O3 -pipe -fomit-frame-pointer
 configure.universal_args-delete --disable-dependency-tracking
 
 
-# the CAPSImage library can be included, but at present there are manual steps that will need to be done for this to work
-# 1. download the dmg from here <http://www.softpres.org/_media/files:ipflib42_macosx-universal.dmg.zip?id=download&cache=cache>
-# 2. move the framework and include files into the proper locations indicated below
-# 3. change ownership and permissions on the include files and library appropriately
-#     a) sudo chown -R root:admin ${prefix}/Library/Frameworks/CAPSImage.framework
-#     b) sudo chmod -R 644 ${prefix}/include/cap
-# 4. update the install name of the library, like below
-#     a) "sudo install_name_tool -id ${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage \
-            ${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage"
+# the CAPSImage library can be included, but can't be built from source
+# the easiest method to do this is with the libcapsimage port from my github repository
 
-set capsimage_framework ${prefix}/Library/Frameworks/capsimage.framework
+set capsimage_framework ${prefix}/Library/Frameworks/CAPSImage.framework
 if {[file exists $capsimage_framework]} {
-    configure.args-append   -DCAPSIMAGE_INCLUDE_DIR:PATH=${prefix}/include/cap
-    configure.args-append   -DCAPSIMAGE_LIBRARY:FILEPATH=${prefix}/Library/Frameworks/capsimage.framework
+    configure.args-append   -DCAPSIMAGE_INCLUDE_DIR:PATH=${prefix}/Library/Frameworks/CAPSImage.framework/Headers
+    configure.args-append   -DCAPSIMAGE_LIBRARY:FILEPATH=${prefix}/Library/Frameworks/CAPSImage.framework/CAPSImage
 }
 
 

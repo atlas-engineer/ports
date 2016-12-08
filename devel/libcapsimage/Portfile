@@ -1,6 +1,10 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# this software is not avaialable in source form from the authours as of 20161207
+# the binary is available for PPC, i386, and x86_64, so we'll have to use that
+# it is linked to libstdc++; there is nothing we can do about that at present
 
 PortSystem              1.0
+
 name                    libcapsimage
 version                 4.2.0
 categories              devel
@@ -8,8 +12,8 @@ license                 GPL-2+
 platforms               darwin
 
 maintainers             gmail.com:ken.cunningham.webuse openmaintainer
-description             Disk image library support
-long_description        Disk image library support
+description             Disk image support library
+long_description        ${description}
 homepage                http://www.softpres.org
 master_sites            http://www.softpres.org/_media/files:ipflib42_macosx-universal.dmg.zip?id=download&cache=cache
 checksums               sha256  a3bb22c8dab474273b51cf3c67279cfd94ec7cadfe14cc81821db5c840183212 \
@@ -18,32 +22,47 @@ checksums               sha256  a3bb22c8dab474273b51cf3c67279cfd94ec7cadfe14cc81
 use_zip                 yes
 
 post-extract {
-
+    # mount the disk image
     system -W ${workpath} "hdiutil attach universal-macosx-capsimage.dmg -noverify"
-#    system -W ${workpath} "hdiutil detach universal-macosx-capsimage.dmg"
 }
 
+# we are just installing binaries, there is no configure or build phase in this port
 use_configure           no
 build {}
 
 destroot.asroot         yes
 destroot {
 
-#    system -W ${workpath} "hdiutil attach universal-macosx-capsimage.dmg -readonly -noverify"
+    # fix up some messed up file permissions on the original disk image
+    set sourcedir /Volumes/universal-macosx-capsimage
+    file attributes ${sourcedir}/include -permissions 0644
+    file attributes ${sourcedir}/include/caps -permissions 0644
+    foreach f [glob -directory ${sourcedir}/include/caps *] {
+        file attributes $f -permissions 0644
+    }
 
-    xinstall -d ${destroot}${prefix}/include/caps/
-    #xinstall {*}[glob /Volumes/universal-macosx-capsimage/include/caps/*.h] \
-                $${destroot}${prefix}/include/caps
+    # copy the framework. Fix the header locations, and copy the headers to the framework
+    copy ${sourcedir}/CAPSImage.framework ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework
+    xinstall -m 755 -d ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/Headers
+    foreach f [glob -directory ${sourcedir}/include/caps *.h] {
+        copy $f ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/Headers/
+     }
+
+    # and a second copy of the headers for linux-based ports like hatari that look for them in include/caps
+    # try as I might, I can't get this installer to make a symbolic link to do this
+    xinstall -m 755 -d ${destroot}${prefix}/include/caps
+    foreach f [glob -directory ${sourcedir}/include/caps *.h] {
+        copy $f ${destroot}${prefix}/include/caps/
+     }
+}
+
+post-destroot {
+
+    # detach the disk image in preparation for deleting it
+    system -W ${workpath} "hdiutil detach /Volumes/universal-macosx-capsimage"
     
-    copy /Volumes/universal-macosx-capsimage/include/caps/capsimage.h ${destroot}${prefix}/include/caps
-    copy /Volumes/universal-macosx-capsimage/include/caps/fdc.h ${destroot}${prefix}/include/caps
-    copy /Volumes/universal-macosx-capsimage/include/caps/form.h ${destroot}${prefix}/include/caps
-    copy /Volumes/universal-macosx-capsimage/CAPSImage.framework ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework
-    system "chown -R root:admin ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework"
-    system "chmod -R 644 ${destroot}${prefix}/include/caps"
+    # fix up the library install name, and add in the missing link for the headers
     system "install_name_tool -id ${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage \
             ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework/Versions/A/CAPSImage"
-
-
-    system -W ${workpath} "hdiutil detach /Volumes/universal-macosx-capsimage"
+    system -W ${destroot}${prefix}/Library/Frameworks/CAPSImage.framework "ln -s Versions/A/Headers Headers"
 }

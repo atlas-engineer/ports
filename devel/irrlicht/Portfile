@@ -1,7 +1,7 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem              1.0
-PortGroup               xcode 1.0
+#PortGroup               xcode 1.0
 name                    irrlicht
 version                 1.8.4
 categories              devel
@@ -19,17 +19,39 @@ checksums               sha256  f42b280bc608e545b820206fe2a999c55f290de5c7509a02
 use_zip                 yes
 
 # one patch to fix an errant typecast in one file
-patchfiles-append       patch-irrlicht-cirrdevice.diff
+patch.pre_args          -p2
+post-extract {
+    patchfiles-append       patch-irrlicht-cirrdevice.diff
+}
 
-xcode.project           ${worksrcpath}/source/Irrlicht/MacOSX/MacOSX.xcodeproj
-xcode.configuration     Release
-xcode.build.settings    SYMROOT=build
 
+
+# there are different ways to build this port
+# one way is using xcode and as a framework - this seems tempting but a number of the 
+# include files don't get copied into the framework's header directory and 
+# software - like minetest - would not build against it
+# also it can be built with the unix Makefile using various targets
+# the best target seems to be sharedlib_osx
+
+use_configure           no
+worksrcdir              ${distname}/source/Irrlicht/
+build.target            sharedlib_osx
+
+
+###### enable these for xcode project #########
+###### and also the PortGroup xcode line above #####
+#xcode.project           ${worksrcpath}/source/Irrlicht/MacOSX/MacOSX.xcodeproj
+#xcode.configuration     Release
+#xcode.build.settings    SYMROOT=build
+
+
+###### enable these for a framework built by xcode ########
 # build framework
-xcode.destroot.type     framework
-xcode.target            IrrFramework
+#xcode.destroot.type     framework
+#xcode.target            IrrFramework
+###########################################################
 
-
+###### enable these for a static library build by xcode
 # build static library
 #xcode.target            libIrrlicht.a
 # destroot {
@@ -38,3 +60,4 @@ xcode.target            IrrFramework
 #     xinstall {*}[glob ${worksrcpath}/include/*.h] \
 #                 ${destroot}${prefix}/include/irrlicht
 # }
+###########################################################
