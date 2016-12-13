@@ -35,7 +35,7 @@ platform darwin {
             configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
         }
     
-        configure.ldflags-append "-stdlib=libc++"
+        configure.ldflags-append      -stdlib=libc++
         
     }
 
