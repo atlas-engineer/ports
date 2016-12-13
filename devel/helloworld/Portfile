@@ -19,14 +19,18 @@ checksums           rmd160  4b7e0e82fcf6e6c5f7e0ad4cebd86403e0a36c17 \
 
 use_configure       no
 
-# force this as this port is for testing libc++ on Leopard/PPC
-configure.cxx_stdlib    libc++
-depends_lib             port:libcxx
+default_variants    +forcelibcxx
 
-platform darwin powerpc {
-    compiler.whitelist           macports-clang-3.4
-    configure.cxxflags-append    -fPIC
-    configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
+variant forcelibcxx description "override settings in macports.conf to force building against libc++" {
+
+    configure.cxx_stdlib    libc++
+    depends_lib             port:libcxx
+    
+    platform darwin powerpc {
+        compiler.whitelist           macports-clang-3.4
+        configure.cxxflags-append    -fPIC -std=c++11
+        configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
+    }
 }
 
 platform darwin {
