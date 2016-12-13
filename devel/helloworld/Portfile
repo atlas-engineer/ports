@@ -19,26 +19,17 @@ checksums           rmd160  4b7e0e82fcf6e6c5f7e0ad4cebd86403e0a36c17 \
 
 use_configure       no
 
-default_variants    +forcelibcxx
+configure.cxx_stdlib    libc++
+depends_lib             port:libcxx
 
-variant forcelibcxx description "override settings in macports.conf to force building against libc++" {
-    configure.cxx_stdlib    libc++
-    depends_lib             port:libcxx
+platform darwin powerpc {
+    compiler.whitelist           macports-clang-3.4
+    configure.cxxflags-append    -fPIC -std=c++11
+    configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
 }
 
 platform darwin {
-    if {${configure.cxx_stdlib} eq "libc++"} {
-    
-        platform darwin powerpc {
-            compiler.whitelist           macports-clang-3.4
-            configure.cxxflags-append    -fPIC -std=c++11
-            configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
-        }
-    
-        configure.ldflags-append      -stdlib=libc++
-        
-    }
-
+    if {${configure.cxx_stdlib} eq "libc++"} {configure.ldflags-append "-stdlib=libc++"}
 }
 
 build.env           CXX="${configure.cxx}" \
