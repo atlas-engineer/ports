@@ -25,7 +25,7 @@ platform darwin {
 
 platform darwin powerpc {
     configure.cxxflags-append    -fPIC
-    configure.ldflags-append     -lc++
+    configure.ldflags-prepend    -nostdlibs -lc++
 }
 
 build.env           CXX="${configure.cxx}" \
