@@ -22,19 +22,23 @@ use_configure       no
 default_variants    +forcelibcxx
 
 variant forcelibcxx description "override settings in macports.conf to force building against libc++" {
-
     configure.cxx_stdlib    libc++
     depends_lib             port:libcxx
-    
-    platform darwin powerpc {
-        compiler.whitelist           macports-clang-3.4
-        configure.cxxflags-append    -fPIC -std=c++11
-        configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
-    }
 }
 
 platform darwin {
-    if {${configure.cxx_stdlib} eq "libc++"} {configure.ldflags-append "-stdlib=libc++"}
+    if {${configure.cxx_stdlib} eq "libc++"} {
+    
+        platform darwin powerpc {
+            compiler.whitelist           macports-clang-3.4
+            configure.cxxflags-append    -fPIC -std=c++11
+            configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
+        }
+    
+        configure.ldflags-append "-stdlib=libc++"
+        
+    }
+
 }
 
 build.env           CXX="${configure.cxx}" \
