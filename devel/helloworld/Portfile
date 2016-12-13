@@ -23,6 +23,11 @@ platform darwin {
     if {${configure.cxx_stdlib} eq "libc++"} {configure.ldflags-append "-stdlib=libc++"}
 }
 
+platform darwin ppc {
+    configure.cxxflags-append    -fPIC
+    configure.ldflags-append     -lc++
+}
+
 build.env           CXX="${configure.cxx}" \
                     CXXFLAGS="${configure.cxxflags} [get_canonical_archflags cxx]" \
                     LDFLAGS="${configure.ldflags} [get_canonical_archflags ld]" \
