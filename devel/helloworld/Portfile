@@ -23,7 +23,7 @@ platform darwin {
     if {${configure.cxx_stdlib} eq "libc++"} {configure.ldflags-append "-stdlib=libc++"}
 }
 
-platform darwin ppc {
+platform darwin powerpc {
     configure.cxxflags-append    -fPIC
     configure.ldflags-append     -lc++
 }
