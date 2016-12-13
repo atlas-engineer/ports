@@ -1,0 +1,46 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem              1.0
+
+name                    libsdl2
+version                 2.0.5_binary_for_10.5_up
+categories              devel multimedia
+license                 zlib
+platforms               macosx
+
+maintainers             nomaintainer
+description             Cross-platform multi-media development API
+
+long_description \
+    Simple DirectMedia Layer is a cross-platform development library \
+    designed to provide low level access to audio, keyboard, mouse, \
+    joystick, and graphics hardware via OpenGL and Direct3D.
+
+
+#https://www.libsdl.org/release/SDL2-2.0.5.dmg                    
+
+distfiles               SDL2-2.0.5.dmg
+homepage                http://www.libsdl.org/
+master_sites            https://www.libsdl.org/release/
+checksums               sha256  09309e5af6739ce91e8e5db443604a0d0d85e0b728652423ba1a00e26363c30c \
+                        rmd160  b60e83889d7bf6803ed2349122c3f103d53b62d5
+
+# we are just installing binaries, there is no extract, configure or build phase in this port
+extract { 
+    system -W ${distpath} "hdiutil attach ${distfiles} -noverify"
+}
+use_configure           no
+build {}
+
+set sourcedir           /Volumes/SDL2
+
+destroot {
+     copy ${sourcedir}/SDL2.framework ${destroot}${prefix}/Library/Frameworks/SDL2.framework
+     xinstall -m 755 -d ${destroot}${prefix}/share/SDL2
+     copy ${sourcedir}/License.txt ${destroot}${prefix}/share/SDL2/
+     copy ${sourcedir}/ReadMe.txt ${destroot}${prefix}/share/SDL2/
+}
+
+post-destroot {
+     system "hdiutil detach /Volumes/SDL2"
+}

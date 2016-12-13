@@ -1,0 +1,31 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           cxx11 1.0
+PortGroup           github 1.0
+
+github.setup        kencu helloworld 9767fc3cc248797fa2df16b0f8926131aed9d6ce
+version             20161212
+categories          devel
+platforms           darwin
+maintainers         gmail.com:ken.cunningham.webuse
+license             GPL-2
+
+description         Hello, world! as a port to test libcxx and cxx11 building
+long_description    ${description}
+
+checksums           rmd160  4b7e0e82fcf6e6c5f7e0ad4cebd86403e0a36c17 \
+                    sha256  528cb9b0e8a89004d1baeeb6d311ce313e5547f0697b6646ec3bdab09153bee6
+
+use_configure       no
+
+platform darwin {
+    if {${configure.cxx_stdlib} eq "libc++"} {configure.ldflags-append "-stdlib=libc++"}
+}
+
+build.env           CXX="${configure.cxx}" \
+                    CXXFLAGS="${configure.cxxflags} [get_canonical_archflags cxx]" \
+                    LDFLAGS="${configure.ldflags} [get_canonical_archflags ld]" \
+                    PREFIX=${prefix}
+
+destroot.env        PREFIX=${prefix}
