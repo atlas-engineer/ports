@@ -1,0 +1,54 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem              1.0
+PortGroup               github 1.0
+PortGroup               cmake 1.0
+
+github.setup            minetest minetest 0.4.14
+
+# file location is https://github.com/minetest/minetest/archive/0.4.14.tar.gz
+# doesn't work
+# github.tarball_from     releases
+# github.tarball_from     downloads
+# master_sites            https://github.com/minetest/minetest/archive/
+
+license                 GPL-3
+categories              games
+platforms               darwin
+maintainers             gmail.com:ken.cunningham.webuse openmaintainer
+description             open source infinite-world block sandbox game with survival and crafting
+long_description        ${description}.
+checksums               rmd160  72e29e14b0c8eb2444c9dd191911a084112b9a2b \
+                        sha256  a2a60db3f22d101f78c582f185242e1d913b86a98a7b583cb2261ab715676910
+
+depends_lib-append      port:irrlicht \
+						port:jpeg \
+						port:libogg \
+						port:libvorbis \
+						port:freetype \
+						port:gettext \
+						port:leveldb \
+						port:hiredis \
+						port:curl \
+						port:doxygen
+
+#						port:lua
+#						port:luajit \
+          						
+
+configure.args-append   -DCMAKE_BUILD_TYPE=Release \
+                        -DBUILD_CLIENT=1 \
+                        -DENABLE_REDIS=1 \
+                        -DENABLE_LEVELDB=1 \
+                        -DENABLE_FREETYPE=1 \
+                        -DENABLE_GETTEXT=1 \
+                        -DENABLE_CURL=1 \
+                        -DIRRLICHT_LIBRARY:FILEPATH=${prefix}/Library/Frameworks/IrrFramework.framework/IrrFramework \
+                        -DIRRLICHT_INCLUDE_DIR:FILEPATH=${prefix}/Library/Frameworks/IrrFramework.framework/Headers \
+                        -DCURSES_INCLUDE_PATH:FILEPATH=${prefix}/include
+
+#                        -DLUA_INCLUDE_DIR:FILEPATH=${worksrcpath}/src/script/lua_api/
+
+#${worksrcfolder}/src/script/lua_api/l_item.h
+                        
+cmake.out_of_source      yes
