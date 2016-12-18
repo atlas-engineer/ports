@@ -1,0 +1,11 @@
+--- ./src/lua/src/CMakeLists.txt.orig	2016-12-18 11:37:58.000000000 -0800
++++ ./src/lua/src/CMakeLists.txt	2016-12-18 11:38:13.000000000 -0800
+@@ -38,7 +38,7 @@
+ 	luaconf.h
+ )
+ 
+-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
++include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}
+ 		${CMAKE_CURRENT_BINARY_DIR})
+ 
+ # Lua library.
