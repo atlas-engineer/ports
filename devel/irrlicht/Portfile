@@ -2,6 +2,7 @@
 
 PortSystem              1.0
 PortGroup               xcode 1.0
+
 name                    irrlicht
 version                 1.8.4
 categories              devel
@@ -21,6 +22,9 @@ use_zip                 yes
 # fix an errant typecast in one file
 patchfiles-append       patch-irrlicht-cirrdevice.diff
 
+# patch out test for older zlib version that fails on some mac systems like 10.6
+patchfiles-append       patch-pngpriv-zlib-test.diff
+
 xcode.project           ${worksrcpath}/source/Irrlicht/MacOSX/MacOSX.xcodeproj
 xcode.configuration     Release
 xcode.build.settings    SYMROOT=build
@@ -33,4 +37,46 @@ post-destroot {
      xinstall -d ${destroot}${prefix}/include/irrlicht/
      xinstall {*}[glob ${worksrcpath}/include/*.h] \
                  ${destroot}${prefix}/include/irrlicht
+
+
+     if {${os.major} <= 10} {
+     # for unknown reasons, the following headers are not copied over during
+     # the xcode build on 10.6 but are copied for 10.12 -- now why is that??
+
+         set flist [list \
+                    CDynamicMeshBuffer.h \
+                    CIndexBuffer.h \
+                    CVertexBuffer.h \
+                    EAttributes.h \
+                    EDeviceTypes.h \
+                    EPrimitiveTypes.h \
+                    EShaderTypes.h \
+                    IBillboardTextSceneNode.h \
+                    IColladaMeshWriter.h \
+                    IDynamicMeshBuffer.h \
+                    IFileArchive.h \
+                    IGUIImageList.h \
+                    IGUITreeView.h \
+                    IGeometryCreator.h \
+                    IIndexBuffer.h \
+                    ILightManager.h \
+                    IRandomizer.h \
+                    ISceneLoader.h \
+                    ISceneNodeAnimatorCameraFPS.h \
+                    ISceneNodeAnimatorCameraMaya.h \
+                    IVertexBuffer.h \
+                    IVolumeLightSceneNode.h \
+                    SVertexIndex.h \
+                    SVertexManipulator.h \
+                    driverChoice.h \
+                    fast_atof.h \
+                    irrpack.h \
+                    irrunpack.h \
+                    path.h ]
+
+            foreach f $flist {
+                file copy ${worksrcpath}/include/$f ${destroot}${prefix}/Library/Frameworks/IrrFramework.framework/Versions/A/Headers
+            }
+      }
+
 }
