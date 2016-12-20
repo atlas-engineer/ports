@@ -20,7 +20,7 @@ long_description    ${description}
 checksums           rmd160  d2b83fb64e2a612dab25f6a49287452899151d78 \
                     sha256  8a1c6cd485ccedcec19b465a32c671924a1975a782f557446a5f049163f70b89
                     
-# macports prefers the shared library option                    
+# macports prefers the shared library option
 configure.args-append -DBUILD_SHARED_LIBS:BOOL=ON
 
 cmake.out_of_source yes
