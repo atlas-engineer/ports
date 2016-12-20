@@ -13,18 +13,22 @@ platforms           darwin
 maintainers         gmail.com:ken.cunningham.webuse openmaintainer
 license             MIT
 
-description         Cross-platform C++ library providing tools for applications to locate themselves, their data assets as well as dependant modules.
-long_description    cpplocate is cross-platform C++ library that provides tools for applications to locate themselves, their data assets, as well as dependant modules.
+description         Cross-platform C++ library providing tools for applications to locate \
+                    themselves, their data assets as well as dependant modules.
+long_description    ${description}
 
 checksums           rmd160  d2b83fb64e2a612dab25f6a49287452899151d78 \
                     sha256  8a1c6cd485ccedcec19b465a32c671924a1975a782f557446a5f049163f70b89
                     
+# macports prefers the shared library option                    
 configure.args-append -DBUILD_SHARED_LIBS:BOOL=ON
+
 cmake.out_of_source yes
 
-patchfiles-append patch-cpplocate-cmake-installdirs.diff
+# one patch to override folder layout logic to match macports
+patchfiles-append   patch-cpplocate-cmake-installdirs.diff
 
 variant docs description "install documentation" {
-     configure.args-append -DOPTION_BUILD_DOCS:BOOL=ON
-     depends_build-append port:doxygen
+    configure.args-append   -DOPTION_BUILD_DOCS:BOOL=ON
+    depends_build-append    port:doxygen
 }
