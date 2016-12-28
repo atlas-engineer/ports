@@ -22,7 +22,7 @@ use_zip                 yes
 # fix an errant typecast in one file
 patchfiles-append       patch-irrlicht-cirrdevice.diff
 
-# patch out test for older zlib version that fails on some mac systems like 10.6
+# patch out test to exclude older zlib versions that fails on some mac systems like 10.6
 patchfiles-append       patch-pngpriv-zlib-test.diff
 
 xcode.project           ${worksrcpath}/source/Irrlicht/MacOSX/MacOSX.xcodeproj
@@ -42,6 +42,7 @@ post-destroot {
      if {${os.major} <= 10} {
      # for unknown reasons, the following headers are not copied over during
      # the xcode build on 10.6 but are copied for 10.12 -- now why is that??
+     # some applications expect to find some of these headers, esp path.h
 
          set flist [list \
                     CDynamicMeshBuffer.h \
