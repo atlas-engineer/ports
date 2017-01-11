@@ -1,0 +1,11 @@
+--- CMakeLists.txt.orig	2016-12-28 14:24:53.000000000 -0800
++++ CMakeLists.txt	2016-12-28 14:26:39.000000000 -0800
+@@ -103,7 +103,7 @@
+ if(UNIX AND SYSTEM_DIR_INSTALL)
+     # Install into the system (/usr/bin or /usr/local/bin)
+     set(INSTALL_ROOT      "share/${project}")       # /usr/[local]/share/<project>
+-    set(INSTALL_CMAKE     "share/${project}/cmake") # /usr/[local]/share/<project>/cmake
++    set(INSTALL_CMAKE     "share/cmake")            # /usr/[local]/share/cmake
+     set(INSTALL_EXAMPLES  "share/${project}")       # /usr/[local]/share/<project>
+     set(INSTALL_DATA      "share/${project}")       # /usr/[local]/share/<project>
+     set(INSTALL_BIN       "bin")                    # /usr/[local]/bin

@@ -8,7 +8,7 @@ PortGroup               github 1.0
 github.setup            cginternals glbinding 2.1.1 v
 categories              devel
 platforms               darwin
-maintainers             gmail.com:ken.cunningham.webuse openmaintainer
+maintainers             nomaintainer
 license                 MIT
 
 description             glbinding is a cross-platform C++ binding for OpenGL
@@ -34,20 +34,32 @@ pre-fetch {
 
 depends_build-append    port:py27-pystache \
                         port:glfw
-
 configure.args-append   -DPYTHON_EXECUTABLE:FILEPATH=${prefix}/bin/python2.7
+
 cmake.out_of_source     yes
 
-# one patch to override folder layout logic to match macports
-patchfiles-append       patch-glbinding-cmake-installdirs.diff
+# patch to override folder layout logic to match macports
+patchfiles-append       001-patch-glbinding-cmake-installdirs.diff
+patchfiles-append       002-patch-glbinding-cmake-files-dir.diff
+
+# patch to make qt example a separate option
+patchfiles-append       003-patch-glbinding-src-examples-cmakelists-optionglexamples.diff
 
 variant docs description "install documentation" {
     configure.args-append   -DOPTION_BUILD_DOCS:BOOL=ON
     depends_build-append    port:doxygen
 }
 
-variant examples description "install examples" {
+variant examples description "install examples without qt5 example" {
     configure.args-append   -DOPTION_BUILD_EXAMPLES:BOOL=ON
-    depends_build-append    port:glew \
-                            port:cpplocate
+    depends_run-append      port:glew \
+    						port:cpplocate
+}
+
+variant qtexamples description "install examples including qt5 example" {
+    configure.args-append   -DOPTION_BUILD_EXAMPLES:BOOL=ON
+    configure.args-append   -DOPTION_BUILD_QT_EXAMPLES:BOOL=ON
+    depends_run-append      port:glew \
+                            port:cpplocate \
+                            port:qt5
 }
