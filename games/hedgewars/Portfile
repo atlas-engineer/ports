@@ -25,80 +25,59 @@ checksums           md5     3718947ea69f57a76a3511678fb8173b \
 
 cmake.out_of_source yes
                         
-depends_build-append   port:fpc \
-                       port:pkgconfig
-                    
+depends_build-append    port:fpc \
+                        port:pkgconfig
+                       
 depends_lib-append  port:ffmpeg \
                     port:libsdl \
+                    port:libsdl_image \
+                    port:libsdl_ttf \
+                    port:libsdl_mixer \
+                    port:libsdl_net \
                     port:zlib \
                     port:libpng \
                     port:qt4-mac
 
 
-# don't build the server unit by default as it has high-ish overhead (ghc, llvm-3.5)
+# don't build the server unit by default as it has high overhead (ghc, llvm-3.5)
+# and at the moment, will not build anyway using macports haskell port
 configure.args-append -DNOSERVER=1
 
-# we need to fully specify the location of the pascal compiler to the cmake build system
+# fully specify the location of the pascal compiler to the cmake build system
 configure.args-append -DCMAKE_Pascal_COMPILER=${prefix}/lib/fpc/bin/fpc
 
 # don't use the sparkle selfupdate mechanism
 configure.args-append -DNOAUTOUPDATE=1
 
-# don't include all support libraries in bundle
+# don't include all of the macports support libraries in the app bundle
 configure.args-append -DSKIPBUNDLE:BOOL=ON
 
-
-# patch the sources to update to the current ffmpeg variable and procedure names
+# patch sources to update to the current ffmpeg variable and procedure names
 patchfiles-append   0001-avwrapper-avframealloc-fix.diff
 patchfiles-append   0002-LibavInteraction-fix.diff
 
 # ghc and llvm-3.5 are expensive to build so make them optional
+# also, server doesn't build at present (20170111) on macports
+# due to haskell unrecognized symbols in source
+# -TO DO - see if haskell can be updated to fix server
+# -TO DO - port:hs-bytestring-show doesn't yet exist on macports
 variant server description "Add LAN server" {
     configure.args-replace -DNOSERVER=1 -DNOSERVER=0
-    depends_build-append  port:ghc
+    depends_build-append    port:ghc \
+                            port:hs-vector \
+                            port:hs-bytestring-show \
+                            port:hs-network \
+                            port:hs-dataenc \
+                            port:hs-hslogger \
+                            port:hs-utf8-string \
+                            port:hs-sha \
+                            port:hs-entropy \
+                            port:hs-zlib \
+                            port:hs-random
 }
 
-cmake.install_prefix   ${destroot}${applications_dir}
-
-# try this
-# configure.args-append -DCMAKE_INSTALL_BINDIR="${destroot}${applications_dir}"
-
-############### destroot problems ###############
-# this port builds itself into a strange destroot location
-# something like ${worksrcdir}${destroot}
-# this problem doesn't seem to be an issue in the homebrew install script
-# it's using the qt bundler script, but sending it a strange output location
-# I can't seem to find the cmake variable or hard-coded script location needed to override it 
-# to put it into ${destroot}${applications_dir} as usual...
-
-# tried these things so far...
-
-# tried to build into the applications directory as usual
-# but this didn't work
-# configure.args-append -DCMAKE_INSTALL_PREFIX:PATH="${destroot}${applications_dir}"
-
-# tried turning this cpack variable back on to allow CMAKE_INSTALL_PREFIX to work
-# see <https://cmake.org/cmake/help/v3.0/variable/CPACK_SET_DESTDIR.html>
-# but this didn't work either
-# configure.args-append -DCPACK_SET_DESTDIR:BOOL=ON
-
-# tried to explicitly specify the output directory
-# this didn't work either
-# configure.args-append -DCMAKE_BINARY_DIR:PATH="${destroot}${applications_dir}"
-
-# tried this - why not?
-# didn't work, tho
-# configure.args-append -DDATA_INSTALL_DIR=${destroot}${applications_dir}
-
-# this didn't work either
-# configure.args-append -DCPACK_PACKAGING_INSTALL_PREFIX:PATH="${destroot}${applications_dir}"
-
-# this didn't work -- but perhaps I can get the string right to find the built app, tho
-# destroot {
-#    copy ${destroot}${worksrcpath}/../build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
-#}
-
-# yeah - well - to no great surprise. This didn't work either
-# post-destroot {
-#    copy ${destroot}${worksrcpath}/../build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
-# }
+# this app builds into build directory using custom build scripts
+# move app to the proper location post-build
+post-destroot {
+    move ${destroot}${workpath}/build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
+ }
