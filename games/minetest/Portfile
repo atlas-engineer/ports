@@ -59,7 +59,7 @@ configure.args-append   -DCMAKE_BUILD_TYPE=Release \
                         -DLUA_LIBRARY:FILEPATH=${prefix}/lib/libluajit-5.1.dylib                      
                         
 
-# this caused a crash on 10.6, but not on 10.12
+# this caused a crash on 10.6 in version 0.4.14, but not 0.4.15, and not on 10.12
 # without this, there are link errors on 10.12
 configure.args-append   -DENABLE_SYSTEM_JSONCPP:BOOL=ON
 
