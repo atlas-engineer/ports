@@ -1,0 +1,22 @@
+--- ./QTfrontend/CMakeLists.txt.orig	2017-01-12 10:20:33.000000000 -0800
++++ ./QTfrontend/CMakeLists.txt	2017-01-12 10:21:33.000000000 -0800
+@@ -172,6 +172,8 @@
+ if(APPLE)
+     find_library(iokit_framework NAMES IOKit)
+     list(APPEND HW_LINK_LIBS ${iokit_framework})
++    list(APPEND HW_LINK_LIBS @@STDLIB@@)
++
+     list(APPEND hwfr_src util/platform/CocoaInitializer.mm
+                          util/platform/InstallController.cpp
+                          util/platform/M3Panel.mm
+@@ -221,10 +223,6 @@
+         )
+ endif()
+ 
+-if(CMAKE_CXX_COMPILER MATCHES "clang*")
+-    list(APPEND HW_LINK_LIBS stdc++ m)
+-endif()
+-
+ target_link_libraries(hedgewars ${HW_LINK_LIBS})
+ 
+ 
