@@ -109,7 +109,7 @@ if { ${cxx_stdlib} eq "libc++"} {
 # 10.10+ should use pas2c (but 10.12 can't build ghc at present due to bug with fix awaiting commit)
 
 if {${os.major} < 14} {
-   default_variant +usepascalcompiler
+   default_variants +usepascalcompiler
 }
 
 # by default, we set up to use the pas2c converter to build the application
