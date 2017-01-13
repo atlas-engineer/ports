@@ -26,8 +26,7 @@ checksums           md5     3718947ea69f57a76a3511678fb8173b \
 cmake.out_of_source yes
 
 
-depends_build-append    port:fpc \
-                        port:pkgconfig
+depends_build-append  port:pkgconfig
                        
 depends_lib-append  port:ffmpeg \
 					port:libogg \
@@ -43,20 +42,20 @@ depends_lib-append  port:ffmpeg \
 
 
 # don't build the server unit by default as it has high overhead (ghc, llvm-3.5)
-# and at the moment, will not build anyway using macports haskell port
+# and at the moment, will not build at present using macports haskell port
 configure.args-append -DNOSERVER=1
 
-# don't use the sparkle selfupdate mechanism
+# don't use the sparkle selfupdate mechanism; use macports instead
 configure.args-append -DNOAUTOUPDATE=1
 
-# don't include all of the macports support libraries in the app bundle
+# don't add all of the macports support libraries to the app bundle
 configure.args-append -DSKIPBUNDLE:BOOL=ON
 
-configure.args-append -DBUILD_ENGINE_C:BOOL=ON
-
-# newer systems need help finding qt4's qmake
+# some systems need help finding qt4's qmake
 configure.args-append -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/qmake
 
+# TO DO - decide whether to use the port's or the systems version
+# for PPC, system version works better
 # the physfs doesn't build correctly on newer macs
 # configure.args-append -DPHYSFS_SYSTEM:BOOL=ON
 
@@ -64,17 +63,15 @@ configure.args-append -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/q
 patchfiles-append   0001-avwrapper-avframealloc-fix.diff
 patchfiles-append   0002-LibavInteraction-fix.diff
 
-
 ####### C++ LINK ISSUE SECTION #########
 # linking to the standard c++ lib is non-standard in this port
-# as it comes, the port uses a hard-coded link to stdc++
+# as downloaded, the port uses a hard-coded link to stdc++, obviously not right
 # this has to be modified in two areas
 
 # first, change the link flags in the hwc engine build script
+# this inhales the $(CXX_FLAGS), which proves the right c++ stdllib
 patchfiles-append   0003-patch-proj-hwc-CMakeLists-proper-link-flags.diff
 
-
-## TO DO -- change link library depending on standard c++ library
 # second, adjust the link in the QTfrontend CMake build script
 # oddly, the usual -stdlib=libc++ fails to link correctly
 # this build requires explicitly specifying c++ or stdc++
@@ -86,20 +83,56 @@ patchfiles-append   0003-patch-proj-hwc-CMakeLists-proper-link-flags.diff
 #    reinplace "s|@@STDLIB@@|c++|g" ${worksrcpath}/QTfrontend/CMakeLists.txt
 #}
 
-# or we can approach it like this, removing the hard-coded std lib, 
+# or we can approach it like this, removing the hard-coded std lib,
 # and adding in the proper one on the ldflags line
 patchfiles-append   0003-patch-remove-hardcoded-stdlib-and-iokit-QTfrontend.patch
 
 # this doesn't work, even though it shows up on the link line - which is confusing
-#configure.ldflags-append -stdlib=libc++
-# but this does
-configure.ldflags-append -lc++
+# configure.ldflags-append -stdlib=libc++
+
+# if { ${cxx_stdlib} ne ""} {
+# 	if { ${cxx_stdlib} eq "libc++"} {
+# 		configure.ldflags-append -lc++
+# 		} elseif { ${cxx_stdlib} eq "libstdc++"} {
+# 		configure.ldflags-append -lstdc++
+# 		} elseif { ${cxx_stdlib} eq "macports-libstdc++"} {
+# 		configure.ldflags-append -lstdc++
+# 		}
+# 		puts ${cxx_stdlib}
+# 		puts "Set c++ library based on macports.conf setting"
+# } else {
+# 		if {${os.major} < 13} {
+# 		   configure.ldflags-append -lstdc++
+# 		} else {
+# 		   configure.ldflags-append -lc++
+# 		}
+# 		puts "Set c++ library based on system version"
+# 
+# }
+
+if { ${cxx_stdlib} eq "libc++"} {
+ 		configure.ldflags-append -lc++
+ 		} else {
+ 		configure.ldflags-append -lstdc++
+ 		}
 
 ####### END C++ LINK ISSUE SECTION #########
 
-
-
 ####### PASCAL COMPILER SECTION #########
+
+# TODo - decide when to use the fpc and when to use pas2c
+# suspect <10.9 should use fpc. 10.10+ probably can't build fpc (10.12 can't)
+# 10.10+ should use pas2c (but 10.12 can't build ghc at present so no win there right now)
+
+if {${os.major} < 14} {
+   default_variant +usepascalcompiler
+}
+
+# by default, use the pas2c converter to build the application
+# this also requires port:ghc to build the pas2c converter
+configure.args-append -DBUILD_ENGINE_C:BOOL=ON
+depends_build-append   port:ghc
+
 variant usepascalcompiler description "Build with the fpc pascal compiler" {
     # fpc seems to have trouble on newer macOS systems
 	# perhaps fpc doesn't like deployment targets to have two final digits
@@ -109,18 +142,24 @@ variant usepascalcompiler description "Build with the fpc pascal compiler" {
 	#macosx_deployment_target 10.11
 	
 	# only needed if we're building with the pascal compiler instead of pas2c
-	depends_build-append    port:fpc
+	depends_build-replace   port:ghc port:fpc
+#	depends_build-delete    port:ghc
+	
 	# fully specify the location of the pascal compiler to the cmake build system
 	configure.args-append -DCMAKE_Pascal_COMPILER=${prefix}/lib/fpc/bin/fpc
 	configure.args-replace -DBUILD_ENGINE_C:BOOL=ON -DBUILD_ENGINE_C:BOOL=OFF
 }
+####### END PASCAL COMPILER SECTION #########
+
                         
 ####### LAN SERVER SECTION #########
-# ghc and llvm-3.5 are expensive to build so first of all make them optional
-# however, the server doesn't build at present (20170111) on macports
+## NOT WORKING AT PRESENT ##
+# the server doesn't build at present (20170111) on macports
 # due to haskell unrecognized symbols when compiling the haskell source
 # -TO DO - see if haskell can be updated to fix server
 # -TO DO - port:hs-bytestring-show doesn't yet exist on macports
+
+# ghc and llvm-3.5 are expensive to build so first of all make them optional
 # variant server description "Add LAN server" {
 #     configure.args-replace -DNOSERVER=1 -DNOSERVER=0
 #     depends_build-append    port:ghc \
@@ -135,7 +174,7 @@ variant usepascalcompiler description "Build with the fpc pascal compiler" {
 #                             port:hs-zlib \
 #                             port:hs-random
 # }
-
+####### END LAN SERVER SECTION #########
 
 # this app builds itself directly into build directory
 # so move it to the proper location post-build
