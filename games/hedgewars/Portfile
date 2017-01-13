@@ -36,8 +36,7 @@ depends_lib-append      port:ffmpeg \
                         port:libsdl_net \
                         port:zlib \
                         port:libpng \
-                        port:qt4-mac \
-                        port:physfs
+                        port:qt4-mac
 
 # This portfile is heavily commented, to assist any beta-testers
 
