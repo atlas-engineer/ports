@@ -1,163 +1,164 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-PortSystem          1.0
-PortGroup           cmake 1.0
+PortSystem              1.0
+PortGroup               cmake 1.0
 
-name                hedgewars
-version             0.9.22
-categories          games
-platforms           darwin
-license             GPL-2
-maintainers         nomaintainer
+name                    hedgewars
+version                 0.9.22
+categories              games
+platforms               darwin
+license                 GPL-2
+maintainers             nomaintainer
 
-description         Funny turn-based artillery game, featuring fighting Hedgehogs!
-long_description    ${description}
-homepage            https://www.hedgewars.org/
+description             Funny turn-based artillery game, featuring fighting Hedgehogs!
+long_description        ${description}
+homepage                https://www.hedgewars.org/
 
-master_sites        http://download.gna.org/${name}/
-use_bzip2           yes
-distfiles           ${name}-src-${version}
-worksrcdir          ${name}-src-${version}
+master_sites            http://download.gna.org/${name}/
+use_bzip2               yes
+distfiles               ${name}-src-${version}
+worksrcdir              ${name}-src-${version}
 
-checksums           md5     3718947ea69f57a76a3511678fb8173b \
-                    sha1    53c2530df88c11297f3c1f6fc85a45f317644fe2 \
-                    rmd160  359fd026643e69446121b94ba301646812353c19
+checksums               md5     3718947ea69f57a76a3511678fb8173b \
+                        sha1    53c2530df88c11297f3c1f6fc85a45f317644fe2 \
+                        rmd160  359fd026643e69446121b94ba301646812353c19
 
-cmake.out_of_source yes
+cmake.out_of_source     yes
 
-
-depends_build-append  port:pkgconfig
+depends_build-append    port:pkgconfig
                        
-depends_lib-append  port:ffmpeg \
-					port:libogg \
-                    port:libsdl \
-                    port:libsdl_image \
-                    port:libsdl_ttf \
-                    port:libsdl_mixer \
-                    port:libsdl_net \
-                    port:zlib \
-                    port:libpng \
-                    port:qt4-mac \
-                    port:physfs
+depends_lib-append      port:ffmpeg \
+					    port:libogg \
+                        port:libsdl \
+                        port:libsdl_image \
+                        port:libsdl_ttf \
+                        port:libsdl_mixer \
+                        port:libsdl_net \
+                        port:zlib \
+                        port:libpng \
+                        port:qt4-mac \
+                        port:physfs
 
+# This portfile is heavily commented, to assist any beta-testers
 
 # don't build the server unit by default as it has high overhead (ghc, llvm-3.5)
-# and at the moment, will not build at present using macports haskell port
-configure.args-append -DNOSERVER=1
+# and at the moment, will not build using the current macports haskell port
+configure.args-append   -DNOSERVER=1
 
-# don't use the sparkle selfupdate mechanism; use macports instead
-configure.args-append -DNOAUTOUPDATE=1
+# don't use the sparkle selfupdate mechanism; use macports update process instead
+configure.args-append   -DNOAUTOUPDATE=1
 
-# don't add all of the macports support libraries to the app bundle
-configure.args-append -DSKIPBUNDLE:BOOL=ON
+# don't add all of the macports support libraries into the app bundle
+configure.args-append   -DSKIPBUNDLE:BOOL=ON
 
-# some systems need help finding qt4's qmake
-configure.args-append -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/qmake
+# some systems will need help finding qt4's qmake
+configure.args-append   -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/qmake
 
-# TO DO - decide whether to use the port's or the systems version
+# TO DO - decide whether to use the port's or the systems version of physfs
 # for PPC, system version works better
-# the physfs doesn't build correctly on newer macs
+# but the physfs doesn't build correctly on newer macs
 # configure.args-append -DPHYSFS_SYSTEM:BOOL=ON
 
-# patch sources to update to the current ffmpeg variable and procedure names
-patchfiles-append   0001-avwrapper-avframealloc-fix.diff
-patchfiles-append   0002-LibavInteraction-fix.diff
+# patch two source files to update to the current ffmpeg variable and procedure names
+patchfiles-append       patch-0001-avwrapper-avframealloc-fix.diff
+patchfiles-append       patch-0002-LibavInteraction-fix.diff
 
-####### C++ LINK ISSUE SECTION #########
-# linking to the standard c++ lib is non-standard in this port
-# as downloaded, the port uses a hard-coded link to stdc++, obviously not right
+####### C++ LINK ISSUES SECTION #########
+# linking to the standard c++ lib is atypical in this port
+# as downloaded, the port inserts a hard-coded link to -lstdc++, which is obviously not right
 # this has to be modified in two areas
 
 # first, change the link flags in the hwc engine build script
-# this inhales the $(CXX_FLAGS), which proves the right c++ stdllib
-patchfiles-append   0003-patch-proj-hwc-CMakeLists-proper-link-flags.diff
+# to $(CXX_FLAGS), which provides the correct c++ stdlib and links properly
+patchfiles-append       patch-0003-proj-hwc-CMakeLists-proper-link-flags.diff
 
 # second, adjust the link in the QTfrontend CMake build script
-# oddly, the usual -stdlib=libc++ fails to link correctly
-# this build requires explicitly specifying c++ or stdc++
+# oddly, however, the usual -stdlib=libc++ fails to link correctly
+# this build requires explicitly specifying -lc++ or -lstdc++
 
 # we could edit CMakeLists.txt file to add in a placeholder
-# and reinplace it on-the-fly
-# patchfiles-append   0004-patch-QT-CMakeLists-stdlib-fix.diff
+# and reinplace it on-the-fly with the correct c++ library
+# patchfiles-append   patch-0004-QT-CMakeLists-stdlib-fix.diff
 #pre-configure {
 #    reinplace "s|@@STDLIB@@|c++|g" ${worksrcpath}/QTfrontend/CMakeLists.txt
 #}
 
-# or we can approach it like this, removing the hard-coded std lib,
-# and adding in the proper one on the ldflags line
-patchfiles-append   0003-patch-remove-hardcoded-stdlib-and-iokit-QTfrontend.patch
-
-# this doesn't work, even though it shows up on the link line - which is confusing
-# configure.ldflags-append -stdlib=libc++
-
-# if { ${cxx_stdlib} ne ""} {
-# 	if { ${cxx_stdlib} eq "libc++"} {
-# 		configure.ldflags-append -lc++
-# 		} elseif { ${cxx_stdlib} eq "libstdc++"} {
-# 		configure.ldflags-append -lstdc++
-# 		} elseif { ${cxx_stdlib} eq "macports-libstdc++"} {
-# 		configure.ldflags-append -lstdc++
-# 		}
-# 		puts ${cxx_stdlib}
-# 		puts "Set c++ library based on macports.conf setting"
-# } else {
-# 		if {${os.major} < 13} {
-# 		   configure.ldflags-append -lstdc++
-# 		} else {
-# 		   configure.ldflags-append -lc++
-# 		}
-# 		puts "Set c++ library based on system version"
-# 
-# }
+# or we can removing the hard-coded std lib,
+# and add in the proper one on the ldflags line
+# macports always sets cxx_stdlib so we can use that
+# if the user has updated it in macports.conf, the new value will be used
+patchfiles-append       patch-0004-remove-hardcoded-stdlib-and-iokit-QTfrontend.diff
 
 if { ${cxx_stdlib} eq "libc++"} {
- 		configure.ldflags-append -lc++
- 		} else {
- 		configure.ldflags-append -lstdc++
- 		}
+    configure.ldflags-append -lc++
+    } else {
+    configure.ldflags-append -lstdc++
+ }
 
 ####### END C++ LINK ISSUE SECTION #########
 
-####### PASCAL COMPILER SECTION #########
 
-# TODo - decide when to use the fpc and when to use pas2c
-# suspect <10.9 should use fpc. 10.10+ probably can't build fpc (10.12 can't)
-# 10.10+ should use pas2c (but 10.12 can't build ghc at present so no win there right now)
+
+####### PASCAL COMPILER SELECT SECTION #########
+
+# this port uses pascal code, either directly (with fpc)
+# or via pas2c, which converts pascal to C code (this requires haskell compiler ghc)
+
+# I believe all systes <10.9 should use fpc.
+# 10.10+ probably can't build fpc (for sure 10.12 can't)
+# 10.10+ should use pas2c (but 10.12 can't build ghc at present due to bug with fix awaiting commit)
 
 if {${os.major} < 14} {
    default_variant +usepascalcompiler
 }
 
-# by default, use the pas2c converter to build the application
-# this also requires port:ghc to build the pas2c converter
+# by default, we set up to use the pas2c converter to build the application
+# this requires port:ghc to build the pas2c converter
 configure.args-append -DBUILD_ENGINE_C:BOOL=ON
 depends_build-append   port:ghc
 
+# and then alter if we want to use the fpc pascal compiler instead
 variant usepascalcompiler description "Build with the fpc pascal compiler" {
     # fpc seems to have trouble on newer macOS systems
-	# perhaps fpc doesn't like deployment targets to have two final digits
-	# tried the adjust this with changing deployment targets, but this didn't work
+	# perhaps it is as simple as fpc doesn't like deployment targets to have two final digits
+	# I tried the adjust this with changing deployment targets, but this didn't work
 	#build.env-append MACOSX_DEPLOYMENT_TARGET="10.9"
 	#configure.env-append MACOSX_DEPLOYMENT_TARGET="10.9"
 	#macosx_deployment_target 10.11
 	
-	# only needed if we're building with the pascal compiler instead of pas2c
+	# we require fpc but not ghc
 	depends_build-replace   port:ghc port:fpc
-#	depends_build-delete    port:ghc
-	
-	# fully specify the location of the pascal compiler to the cmake build system
+
+	# we need to fully specify the location of the pascal compiler to the cmake build system
 	configure.args-append -DCMAKE_Pascal_COMPILER=${prefix}/lib/fpc/bin/fpc
+	
+	# and tell the CMake script to use the pascal compiler
 	configure.args-replace -DBUILD_ENGINE_C:BOOL=ON -DBUILD_ENGINE_C:BOOL=OFF
 }
 ####### END PASCAL COMPILER SECTION #########
 
+platform darwin 9 powerpc {
+    #for PPC build
+    configure.args-append     -Dppc_support=1
+    
+    # for some reason needs to have this framework added to the link
+    configure.ldflags-append  -framework IOKit
+    
+    # the physfs doesn't build correctly on ppc macs due to rpath configuration issues
+    configure.args-append     -DPHYSFS_SYSTEM:BOOL=ON
+    depends_lib-append        port:physfs
+    # game starts, but game engine crashes with exit code 4
+    #######################################################################
+}
+
                         
 ####### LAN SERVER SECTION #########
-## NOT WORKING AT PRESENT ##
+## This is NOT WORKING AT PRESENT ##
 # the server doesn't build at present (20170111) on macports
-# due to haskell unrecognized symbols when compiling the haskell source
+# due to haskell compiler unrecognized symbols when compiling the haskell LAN server source
 # -TO DO - see if haskell can be updated to fix server
-# -TO DO - port:hs-bytestring-show doesn't yet exist on macports
+# -TO DO - port:hs-bytestring-show doesn't yet exist on macports so if we want to enable this
+#  we also need to send up hs-bytestring-show to macports (in my repo)
 
 # ghc and llvm-3.5 are expensive to build so first of all make them optional
 # variant server description "Add LAN server" {
@@ -177,7 +178,8 @@ variant usepascalcompiler description "Build with the fpc pascal compiler" {
 ####### END LAN SERVER SECTION #########
 
 # this app builds itself directly into build directory
-# so move it to the proper location post-build
+# so move it to the proper location post-build, and install the man page too
 post-destroot {
     move ${destroot}${workpath}/build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
+    move ${worksrcpath}/man/hedgewars.6 ${destroot}${prefix}/share/man/man6/hedgewars.6
  }
