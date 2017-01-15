@@ -64,24 +64,17 @@ configure.args-append   -DNOAUTOUPDATE=1
 # don't add all of the macports support libraries into the app bundle
 configure.args-append   -DSKIPBUNDLE:BOOL=ON
 
-# on some systems cmake needs help finding qt4's qmake
 configure.args-append   -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/qmake
 
-# TO DO - decide whether to use the port's or the systems version of physfs
-# for PPC, system version works better due to rpath code in PPC
-# but the physfs doesn't build correctly on newer macs
-# configure.args-append  -DPHYSFS_SYSTEM:BOOL=ON
-
-# patch two source files to update to the current ffmpeg variable and procedure names
+# update two source files to the current ffmpeg variable and procedure names
 patchfiles-append       patch-0001-avwrapper-avframealloc-fix.diff
 patchfiles-append       patch-0002-LibavInteraction-fix.diff
 
 # change the link flags in the hwc engine build script
-# to $(CXX_FLAGS), which provides the correct c++ stdlib and links properly
 patchfiles-append       patch-0003-proj-hwc-CMakeLists-proper-link-flags.diff
 
 # remove hard-coded link to stdlibc++ in QTfrontend build, and add in link to correct stdlib
-# requires this to be -lc++ or -lstdc++ -- setting -stdlib=libc++ does not work
+# requires this to be -lc++ or -lstdc++ -- setting -stdlib=libc++ did not work
 patchfiles-append       patch-0004-remove-hardcoded-stdlib-and-iokit-QTfrontend.diff
 if { ${cxx_stdlib} eq "libc++"} {
     configure.ldflags-append -lc++
@@ -89,29 +82,20 @@ if { ${cxx_stdlib} eq "libc++"} {
     configure.ldflags-append -lstdc++
  }
 
-# lan server fails to build with this optimization flag enabled
+# lan server fails to build unless this optimization flag is disabled
 patchfiles-append       patch-0005-remove-haskell-spec-constr.diff
 
-# by default, use the pas2c converter to build the application
+# by default, use the pas2c converter to compile the pascal portions
 configure.args-append -DBUILD_ENGINE_C:BOOL=ON
 
-# if {${os.major} < 14} {
-#   default_variants +usepascalcompiler
-# }
-
-# and then alter if we want to use the fpc pascal compiler instead
 variant usepascalcompiler description "Build with the fpc pascal compiler" {
 	depends_build-append   port:fpc
-
+	configure.args-replace -DBUILD_ENGINE_C:BOOL=ON -DBUILD_ENGINE_C:BOOL=OFF
 	# we need to fully specify the location of the pascal compiler to the cmake build system
 	configure.args-append -DCMAKE_Pascal_COMPILER=${prefix}/lib/fpc/bin/fpc
-	
-	# and tell the CMake script to use the pascal compiler
-	configure.args-replace -DBUILD_ENGINE_C:BOOL=ON -DBUILD_ENGINE_C:BOOL=OFF
 }
 
-# this app builds directly into build directory
-#  move it to the proper location post-build, and install the man page
+# this app builds directly into build directory; move it to the proper location
 post-destroot {
     move ${destroot}${workpath}/build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
     move ${worksrcpath}/man/hedgewars.6 ${destroot}${prefix}/share/man/man6/hedgewars.6
