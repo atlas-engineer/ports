@@ -1,14 +1,5 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-# -TO DO - port:hs-bytestring-show doesn't yet exist on macports so if we want to enable this
-
-# Status - works correctly on 10.6 (w libc++), 10.7 (w libc++), and 10.12
-# can build but fails in openGL code on 10.5 PPC
-
-# this port uses a combination of c++, haskell, and also pascal code, 
-# pascal code can be compiled either directly (with fpc)
-# or via pas2c, which converts pascal to C code (this requires haskell compiler ghc)
-
 PortSystem              1.0
 PortGroup               cmake 1.0
 
@@ -17,7 +8,7 @@ version                 0.9.22
 categories              games
 platforms               darwin
 license                 GPL-2
-maintainers             nomaintainer
+maintainers             gmail:ken.cunningham.webuse openmaintainer
 
 description             Funny turn-based artillery game, featuring fighting Hedgehogs!
 long_description        ${description}
@@ -48,7 +39,7 @@ depends_build-append    port:pkgconfig \
                         port:hs-random
                     
 depends_lib-append      port:ffmpeg \
-					    port:libogg \
+                        port:libogg \
                         port:libsdl \
                         port:libsdl_image \
                         port:libsdl_ttf \
@@ -66,15 +57,16 @@ configure.args-append   -DSKIPBUNDLE:BOOL=ON
 
 configure.args-append   -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/qmake
 
-# update two source files to the current ffmpeg variable and procedure names
+# update two source files to enable building against the current ffmpeg variable and procedure names
 patchfiles-append       patch-0001-avwrapper-avframealloc-fix.diff
 patchfiles-append       patch-0002-LibavInteraction-fix.diff
 
-# change the link flags in the hwc engine build script
+# replace the hard-coded link to libstdc++ in the hwc engine build script with proper link flags
 patchfiles-append       patch-0003-proj-hwc-CMakeLists-proper-link-flags.diff
 
-# remove hard-coded link to stdlibc++ in QTfrontend build, and add in link to correct stdlib
-# requires this to be -lc++ or -lstdc++ -- setting -stdlib=libc++ did not work
+# remove the hard-coded link to libstdc++ in QTfrontend cmake build script, and add in link to correct stdlib
+# oddly it requires this link flag to be -lc++ or -lstdc++ -- setting -stdlib=libc++ or -stdlib=libstdc++
+# did not generate a proper link. Admittedly this is not standard, but works correctly on all tested systems
 patchfiles-append       patch-0004-remove-hardcoded-stdlib-and-iokit-QTfrontend.diff
 if { ${cxx_stdlib} eq "libc++"} {
     configure.ldflags-append -lc++
@@ -82,20 +74,13 @@ if { ${cxx_stdlib} eq "libc++"} {
     configure.ldflags-append -lstdc++
  }
 
-# lan server fails to build unless this optimization flag is disabled
+# lan server build fails unless this haskell optimization flag is disabled
+# probably due to excessive recursion
 patchfiles-append       patch-0005-remove-haskell-spec-constr.diff
 
-# by default, use the pas2c converter to compile the pascal portions
-configure.args-append -DBUILD_ENGINE_C:BOOL=ON
+# use the pas2c converter to compile the pascal portions rather than fpc
+configure.args-append   -DBUILD_ENGINE_C:BOOL=ON
 
-variant usepascalcompiler description "Build with the fpc pascal compiler" {
-	depends_build-append   port:fpc
-	configure.args-replace -DBUILD_ENGINE_C:BOOL=ON -DBUILD_ENGINE_C:BOOL=OFF
-	# we need to fully specify the location of the pascal compiler to the cmake build system
-	configure.args-append -DCMAKE_Pascal_COMPILER=${prefix}/lib/fpc/bin/fpc
-}
-
-# this app builds directly into build directory; move it to the proper location
 post-destroot {
     move ${destroot}${workpath}/build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
     move ${worksrcpath}/man/hedgewars.6 ${destroot}${prefix}/share/man/man6/hedgewars.6
