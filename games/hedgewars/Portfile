@@ -47,6 +47,7 @@ depends_lib-append      port:ffmpeg \
                         port:libsdl_net \
                         port:zlib \
                         port:libpng \
+                        port:glew \
                         port:qt4-mac
 
 # don't use the sparkle selfupdate mechanism; use macports update process instead
