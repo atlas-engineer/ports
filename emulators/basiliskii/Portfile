@@ -1,9 +1,10 @@
-# $Id: Portfile 135117 2015-04-15 19:51:30Z ryandesign@macports.org $
-
 PortSystem              1.0
 PortGroup               github 1.0
-github.setup            cebix macemu 1bf6f4d64023851e5de17c7d3090db99c7671c04
-version                 20160829
+PortGroup               compiler_blacklist_versions 1.0
+
+github.setup            cebix macemu 14f2e85c6fdf416b406582b6ed8a0339c6fb4eaf
+version                 20170509
+
 name                    basiliskii
 categories              emulators
 license                 GPL-2+
@@ -16,8 +17,16 @@ long_description \
 
 homepage                http://basilisk.cebix.net/
 
-checksums               rmd160  dfb34774447bffa1f741846889f78914d1d2f7f5 \
-                        sha256  cddbeada2ad55db44e4b2312dc2fa94ff3c5667e85bacfa057765e4269f3b1da
+# older version ----------
+# github.setup            cebix macemu 1bf6f4d64023851e5de17c7d3090db99c7671c04
+# version                 20160829
+#checksums               rmd160  dfb34774447bffa1f741846889f78914d1d2f7f5 \
+#                        sha256  cddbeada2ad55db44e4b2312dc2fa94ff3c5667e85bacfa057765e4269f3b1da
+# older version -----------
+
+checksums           rmd160  ccb91c1c6a6f06f4eea0b43774c3a4fb68de3a09 \
+                    sha256  7cb8542ff37dff6f6d182db750dbc8911154d937d414038f01496aad28ca37ef
+
 
 #only if building for SDL, though
 depends_lib             port:libsdl \
@@ -33,6 +42,11 @@ patchfiles-append       001-Basilisk-makefile-in-ditto-patch.diff \
 worksrcdir              ${distname}/BasiliskII/src/Unix
 configure.cmd           ./autogen.sh
 configure.optflags      -O3
+
+# fix clock_gettime error in Sierra
+if ${os.major} >= 12 {
+    configure.env-append    ac_cv_func_clock_gettime=no
+}
 
 #default configure args - these work best for 10.6 onwards, using SDL and GTK for GUI interface
 configure.args          --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio --enable-standalone-gui
