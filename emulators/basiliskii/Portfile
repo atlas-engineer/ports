@@ -44,7 +44,7 @@ configure.cmd           ./autogen.sh
 configure.optflags      -O3
 
 # fix clock_gettime error in Sierra
-if ${os.major} >= 12 {
+if { ${os.major} >= 12 } {
     configure.env-append    ac_cv_func_clock_gettime=no
 }
 
