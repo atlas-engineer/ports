@@ -54,9 +54,7 @@ if {${subport} eq "basiliskii"} {
 
     depends_lib         port:libsdl
     depends_lib         port:basiliskii-gui
-    
     configure.args      --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio
-
     build.target        BasiliskII BasiliskII_app
 
     # basiliskii only works well at present (with JIT and SLIRP networking) in 32 bit mode
@@ -75,8 +73,8 @@ if {${subport} eq "basiliskii"} {
 
 } elseif {${subport} eq "basiliskii-gui"} {
 
-    # we build the gtk2 gui separately to avoid rebuilding all of gtk as +universal
-
+    # we build the gtk2 gui separately as a subport to avoid rebuilding all of 
+    # gtk2 with all the dependencies as +universal
     description         Graphical user interface to configure basiliskii.
     
     long_description    ${description}
@@ -84,13 +82,14 @@ if {${subport} eq "basiliskii"} {
     depends_lib         port:gtk2
     configure.args      --disable-vosf --without-esd --without-mon --enable-standalone-gui
     build.target        BasiliskIIGUI BasiliskIIGUI_app
-
-    # gui target insists on installing some of the basiliskii files, which conflicts with basiliskii subport
-    # so we manually delete these to avoid a conflict
     
     post-destroot {
         file mkdir ${destroot}${applications_dir}${basiliskii_dir}
         copy ${worksrcpath}/BasiliskIIGUI.app ${destroot}${applications_dir}${basiliskii_dir}
+
+        # gui target insists on installing some of the basiliskii files, which conflicts with basiliskii subport
+        # so we manually delete these to avoid a conflict
+
         file delete ${destroot}${prefix}/bin/BasiliskII
         file delete ${destroot}${prefix}/share/BasiliskII/fbdevices
         file delete ${destroot}${prefix}/share/BasiliskII/keycodes
