@@ -49,36 +49,38 @@ if {${subport} eq "basiliskii"} {
         these are not supplied with this port. The emulator will be installed into your \
         MacPorts Applications folder.
 
-    # the gui will be built usually as x86_64 against a similar gtk2
-    # no need for gui to be same architecture as the emulator
-    depends_skip_archcheck-append \
-                        basiliskii-gui
-
-    depends_lib         port:libsdl
-    depends_lib         port:basiliskii-gui
-    configure.args      --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio
-    build.target        BasiliskII BasiliskII_app
-
-    # basiliskii only works well at present (with JIT and SLIRP networking) in 32 bit mode
-    # on intel, force to 32bit and enable the JIT compiler
     platform darwin i386 {
-        supported_archs         i386
-        configure.args-append   --enable-jit-compiler
+        supported_archs   i386
+
+        # no need for gui to be same architecture as the emulator
+        depends_skip_archcheck-append \
+                          basiliskii-gui
+
+        depends_lib       port:libsdl \
+                          port:basiliskii-gui
+                          
+        configure.args    --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio --enable-jit-compiler
     }
-    
+
+    platform darwin powerpc {
+        # on 10.4 ppc you don't need this. On 10.5 ppc the SDL version segfaulted, so offer this version
+        supported_archs   ppc
+        configure.args    --disable-vosf --without-esd --without-mon --enable-macosx-sound --enable-macosx-gui --without-gtk
+    }
+
+    build.target          BasiliskII BasiliskII_app
+
     post-destroot {
         file mkdir ${destroot}${applications_dir}${basiliskii_dir}
         copy ${filespath}/BasiliskII_idiosyncracies.txt ${destroot}${applications_dir}${basiliskii_dir}
         copy ${worksrcpath}/BasiliskII.app ${destroot}${applications_dir}${basiliskii_dir}
     }
 
-
 } elseif {${subport} eq "basiliskii-gui"} {
 
-    # we build the gtk2 gui separately as a subport to avoid rebuilding all of 
-    # gtk2 with all the dependencies as +universal
+    # we build the gtk2 gui separately as a subport to avoid expensively rebuilding all of
+    # gtk2 and all the dependencies as +universal
     description         Graphical user interface to configure basiliskii.
-    
     long_description    ${description}
 
     depends_lib         port:gtk2
@@ -99,5 +101,4 @@ if {${subport} eq "basiliskii"} {
         file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1.gz
         file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1
     }
-
 }
