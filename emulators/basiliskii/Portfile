@@ -1,105 +1,101 @@
 PortSystem              1.0
 PortGroup               github 1.0
-PortGroup               compiler_blacklist_versions 1.0
 
 github.setup            cebix macemu 14f2e85c6fdf416b406582b6ed8a0339c6fb4eaf
 version                 20170509
 
+# we need a name here as the github-supplied name is not correct for this port
 name                    basiliskii
+
+# separate subport for the gtk gui, to prevent rebuilding all of gtk as universal
+subport                 basiliskii-gui {}
+
 categories              emulators
 license                 GPL-2+
 platforms               darwin
 maintainers             gmail.com:ken-cunningham-webuse openmaintainer
-description             Opensource 68k Mac emulator.
 
-long_description \
-    Longstanding 68K Macintosh emulator. Requires an appropriate Macintosh ROM image and a copy of Mac OS (0.x thru 7.5 for Classic emulation, 7.x or 8.0/8.1 for Mac II emulation), and these are not supplied with this port. The emulator will be installed into your MacPorts Applications folder.
-
+# the main homepage is not the github-supplied homepage
 homepage                http://basilisk.cebix.net/
 
-# older version ----------
-# github.setup            cebix macemu 1bf6f4d64023851e5de17c7d3090db99c7671c04
-# version                 20160829
-#checksums               rmd160  dfb34774447bffa1f741846889f78914d1d2f7f5 \
-#                        sha256  cddbeada2ad55db44e4b2312dc2fa94ff3c5667e85bacfa057765e4269f3b1da
-# older version -----------
-
-checksums           rmd160  ccb91c1c6a6f06f4eea0b43774c3a4fb68de3a09 \
-                    sha256  7cb8542ff37dff6f6d182db750dbc8911154d937d414038f01496aad28ca37ef
-
-
-#only if building for SDL, though
-depends_lib             port:libsdl \
-                        port:gtk2
-
-compiler.blacklist-append   {clang < 500} macports-clang-2.9 macports-clang-3.0 macports-clang-3.1 macports-clang-3.2 macports-clang-3.3
-compiler.blacklist-append   {*gcc-4.[1-9]} {*gcc-3*}
-
-patchfiles-append       001-Basilisk-makefile-in-ditto-patch.diff \
-                        002-configure-ac-delete-stdlib-addition-darwin.diff \
-                        003-basiliskii-fix-missing-keycodes-macosxgui-selection.diff
+checksums               rmd160  ccb91c1c6a6f06f4eea0b43774c3a4fb68de3a09 \
+                        sha256  7cb8542ff37dff6f6d182db750dbc8911154d937d414038f01496aad28ca37ef
 
 worksrcdir              ${distname}/BasiliskII/src/Unix
 configure.cmd           ./autogen.sh
 configure.optflags      -O3
 
+patchfiles-append       001-Basilisk-makefile-in-ditto-patch.diff \
+                        002-configure-ac-delete-stdlib-addition-darwin.diff \
+                        003-basiliskii-fix-missing-keycodes-macosxgui-selection.diff
+
 # fix clock_gettime error in Sierra
-if { ${os.major} >= 12 } {
+if {${os.platform} eq "darwin" && ${os.major} >= 12} {
     configure.env-append    ac_cv_func_clock_gettime=no
 }
 
-#default configure args - these work best for 10.6 onwards, using SDL and GTK for GUI interface
-configure.args          --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio --enable-standalone-gui
-
-# Darwin8 and probably Darwin9 can use a rather cool MacOSX GUI version, that requires no SDL or GTK. 
-# The JIT is i386 only still, but the PPC version runs just as fast, even without the JIT
-# There are some idiosyncracies with this version, however - some of the addtions made to the SDL version haven't made it to the 
-# MacOSX GUI version, which looks pretty stagnant. The video in full screen mode seems buggy in certain colour depths
-# and it had a hard crash when switching screen settings using the control strip once. Might be fun for some to try
-#Darwin 8 version with MacOSX GUI
-#configure.args          --disable-vosf --without-esd --without-mon --enable-macosx-sound --enable-macosx-gui --without-gtk
-#if i386 arch            --enable-jit-compiler
-# no BasiliskIIGUI BasiliskIIGUI_app with the MacOSX GUI version
-#build.target            BasiliskII BasiliskII_app
-
-
-if { ${configure.cxx_stdlib} eq "libc++" && [string match "*clang*" [option configure.cxx]] && ${os.major} <= 12 } {
-        configure.ldflags-append -stdlib=libc++
-        set haveset_libcxx_manually    yes
-}
-
-build.target            BasiliskII BasiliskII_app BasiliskIIGUI BasiliskIIGUI_app
-
 set basiliskii_dir      /BasiliskII
-
-post-destroot {
-    file mkdir ${destroot}${applications_dir}${basiliskii_dir}
-    copy ${filespath}/BasiliskII_idiosyncracies.txt ${destroot}${applications_dir}${basiliskii_dir}
-    copy ${worksrcpath}/BasiliskII.app ${destroot}${applications_dir}${basiliskii_dir}
-    copy ${worksrcpath}/BasiliskIIGUI.app ${destroot}${applications_dir}${basiliskii_dir}
-}
-
-# if we're building i386, we will always want the JIT available
-platform darwin i386 {
-    configure.args-append --enable-jit-compiler
-}
-
 universal_variant       no
 
-#if we're on intel, we want to default to i386, but allow an override to x86_64 (with no JIT)
-default_variants        +jitslurp
-variant jitslurp description {the JIT compiler and slirp networking are recommended but they are currently supported on i386 architectures only} {
-    supported_archs         i386
-    configure.args-append   --enable-jit-compiler
-}
+if {${subport} eq "basiliskii"} {
 
-variant usegcc40 description {ancient versions of gcc40 can sometimes work better for building BasiliskII, if your system still supports them} {
-        compiler.whitelist          gcc-4.0 apple-gcc-4.0
-        # base will error out here if neither gcc40 version is available
-        
-        # gcc40 will error out if there is a reference to -stdlib=libc++ on the link line, so unset it if we have set it manually
-        if {${haveset_libcxx_manually} eq "yes"} {
-            configure.ldflags-delete    -stdlib=libc++
-        }
-}
+	description         Opensource 68k Mac emulator.
+	
+	long_description \
+		Longstanding 68K Macintosh emulator. Requires an appropriate Macintosh ROM image and a copy \
+		of Mac OS (0.x thru 7.5 for Classic emulation, 7.x or 8.0/8.1 for Mac II emulation), and \
+		these are not supplied with this port. The emulator will be installed into your \
+		MacPorts Applications folder.
 
+    # the gui will be built usually as x86_64 against a similar gtk2
+    # no need for gui to be same architecture as the emulator
+    depends_skip_archcheck-append basiliskii-gui
+
+    depends_lib             port:libsdl
+    depends_lib             port:basiliskii-gui
+    
+    configure.args          --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio
+
+    build.target            BasiliskII BasiliskII_app
+
+    # on intel, set to 32bit mode and enable the JIT compiler
+    platform darwin i386 {
+        supported_archs         i386
+        configure.args-append   --enable-jit-compiler
+    }
+    
+    post-destroot {
+		file mkdir ${destroot}${applications_dir}${basiliskii_dir}
+		copy ${filespath}/BasiliskII_idiosyncracies.txt ${destroot}${applications_dir}${basiliskii_dir}
+		copy ${worksrcpath}/BasiliskII.app ${destroot}${applications_dir}${basiliskii_dir}
+    }
+
+
+} elseif {${subport} eq "basiliskii-gui"} {
+
+    # basiliskii only works well at present (with JIT and SLIRP networking) in 32 bit mode
+    # so we build the gtk2 gui separately to avoid rebuilding all of gtk as +universal
+
+	description             Graphical user interface to configure basiliskii.
+	
+	long_description        ${description}
+
+    depends_lib             port:gtk2
+    configure.args          --disable-vosf --without-esd --without-mon --enable-standalone-gui
+    build.target            BasiliskIIGUI_app
+
+	# gui target insists on installing some of the basiliskii files, which conflicts with basiliskii subport
+	# so we manually delete these to avoid a conflict
+    
+    post-destroot {
+		file mkdir ${destroot}${applications_dir}${basiliskii_dir}
+		copy ${worksrcpath}/BasiliskIIGUI.app ${destroot}${applications_dir}${basiliskii_dir}
+		file delete ${destroot}${prefix}/bin/BasiliskII
+		file delete ${destroot}${prefix}/share/BasiliskII/fbdevices
+		file delete ${destroot}${prefix}/share/BasiliskII/keycodes
+		file delete ${destroot}${prefix}/share/BasiliskII/tunconfig
+		file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1.gz
+		file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1
+    }
+
+}
