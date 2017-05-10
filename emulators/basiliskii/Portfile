@@ -25,9 +25,9 @@ worksrcdir              ${distname}/BasiliskII/src/Unix
 configure.cmd           ./autogen.sh
 configure.optflags      -O3
 
-patchfiles-append       001-Basilisk-makefile-in-ditto-patch.diff \
-                        002-configure-ac-delete-stdlib-addition-darwin.diff \
-                        003-basiliskii-fix-missing-keycodes-macosxgui-selection.diff
+patchfiles-append       patch-001-Basilisk-makefile-in-ditto-patch.diff \
+                        patch-002-configure-ac-delete-stdlib-addition-darwin.diff \
+                        patch-003-basiliskii-fix-missing-keycodes-macosxgui-selection.diff
 
 # fix clock_gettime error in Sierra
 if {${os.platform} eq "darwin" && ${os.major} >= 12} {
@@ -39,63 +39,64 @@ universal_variant       no
 
 if {${subport} eq "basiliskii"} {
 
-	description         Opensource 68k Mac emulator.
-	
-	long_description \
-		Longstanding 68K Macintosh emulator. Requires an appropriate Macintosh ROM image and a copy \
-		of Mac OS (0.x thru 7.5 for Classic emulation, 7.x or 8.0/8.1 for Mac II emulation), and \
-		these are not supplied with this port. The emulator will be installed into your \
-		MacPorts Applications folder.
+    description         Opensource 68k Mac emulator.
+    
+    long_description \
+        Longstanding 68K Macintosh emulator. Requires an appropriate Macintosh ROM image and a copy \
+        of Mac OS (0.x thru 7.5 for Classic emulation, 7.x or 8.0/8.1 for Mac II emulation), and \
+        these are not supplied with this port. The emulator will be installed into your \
+        MacPorts Applications folder.
 
     # the gui will be built usually as x86_64 against a similar gtk2
     # no need for gui to be same architecture as the emulator
-    depends_skip_archcheck-append basiliskii-gui
+    depends_skip_archcheck-append \
+                        basiliskii-gui
 
-    depends_lib             port:libsdl
-    depends_lib             port:basiliskii-gui
+    depends_lib         port:libsdl
+    depends_lib         port:basiliskii-gui
     
-    configure.args          --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio
+    configure.args      --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio
 
-    build.target            BasiliskII BasiliskII_app
+    build.target        BasiliskII BasiliskII_app
 
-    # on intel, set to 32bit mode and enable the JIT compiler
+    # basiliskii only works well at present (with JIT and SLIRP networking) in 32 bit mode
+    # on intel, force to 32bit and enable the JIT compiler
     platform darwin i386 {
         supported_archs         i386
         configure.args-append   --enable-jit-compiler
     }
     
     post-destroot {
-		file mkdir ${destroot}${applications_dir}${basiliskii_dir}
-		copy ${filespath}/BasiliskII_idiosyncracies.txt ${destroot}${applications_dir}${basiliskii_dir}
-		copy ${worksrcpath}/BasiliskII.app ${destroot}${applications_dir}${basiliskii_dir}
+        file mkdir ${destroot}${applications_dir}${basiliskii_dir}
+        copy ${filespath}/BasiliskII_idiosyncracies.txt ${destroot}${applications_dir}${basiliskii_dir}
+        copy ${worksrcpath}/BasiliskII.app ${destroot}${applications_dir}${basiliskii_dir}
     }
 
 
 } elseif {${subport} eq "basiliskii-gui"} {
 
-    # basiliskii only works well at present (with JIT and SLIRP networking) in 32 bit mode
-    # so we build the gtk2 gui separately to avoid rebuilding all of gtk as +universal
+    # we build the gtk2 gui separately to avoid rebuilding all of gtk as +universal
 
-	description             Graphical user interface to configure basiliskii.
-	
-	long_description        ${description}
+    description         Graphical user interface to configure basiliskii.
+    
+    long_description    ${description}
 
-    depends_lib             port:gtk2
-    configure.args          --disable-vosf --without-esd --without-mon --enable-standalone-gui
-    build.target            BasiliskIIGUI_app
+    depends_lib         port:gtk2
+    configure.args      --disable-vosf --without-esd --without-mon --enable-standalone-gui
+    build.target        BasiliskIIGUI BasiliskIIGUI_app
 
-	# gui target insists on installing some of the basiliskii files, which conflicts with basiliskii subport
-	# so we manually delete these to avoid a conflict
+    # gui target insists on installing some of the basiliskii files, which conflicts with basiliskii subport
+    # so we manually delete these to avoid a conflict
     
     post-destroot {
-		file mkdir ${destroot}${applications_dir}${basiliskii_dir}
-		copy ${worksrcpath}/BasiliskIIGUI.app ${destroot}${applications_dir}${basiliskii_dir}
-		file delete ${destroot}${prefix}/bin/BasiliskII
-		file delete ${destroot}${prefix}/share/BasiliskII/fbdevices
-		file delete ${destroot}${prefix}/share/BasiliskII/keycodes
-		file delete ${destroot}${prefix}/share/BasiliskII/tunconfig
-		file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1.gz
-		file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1
+        file mkdir ${destroot}${applications_dir}${basiliskii_dir}
+        copy ${worksrcpath}/BasiliskIIGUI.app ${destroot}${applications_dir}${basiliskii_dir}
+        file delete ${destroot}${prefix}/bin/BasiliskII
+        file delete ${destroot}${prefix}/share/BasiliskII/fbdevices
+        file delete ${destroot}${prefix}/share/BasiliskII/keycodes
+        file delete ${destroot}${prefix}/share/BasiliskII/tunconfig
+        file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1.gz
+        file delete ${destroot}${prefix}/share/man/man1/BasiliskII.1
     }
 
 }
