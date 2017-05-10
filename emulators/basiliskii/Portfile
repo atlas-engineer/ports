@@ -85,7 +85,7 @@ if {${subport} eq "basiliskii"} {
 
     depends_lib         port:gtk2
     configure.args      --disable-vosf --without-esd --without-mon --enable-standalone-gui
-    build.target        BasiliskIIGUI BasiliskIIGUI_app
+    build.target        BasiliskIIGUI_app
     
     post-destroot {
         file mkdir ${destroot}${applications_dir}${basiliskii_dir}
