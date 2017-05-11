@@ -34,7 +34,8 @@ if {${os.platform} eq "darwin" && ${os.major} >= 12} {
     configure.env-append    ac_cv_func_clock_gettime=no
 }
 
-depends_build           port:autoconf
+depends_build           port:autoconf \
+                        port:pkgconfig
 
 set basiliskii_dir      /BasiliskII
 universal_variant       no
