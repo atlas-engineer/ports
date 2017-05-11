@@ -60,7 +60,10 @@ if {${subport} eq "basiliskii"} {
         depends_lib       port:libsdl \
                           port:basiliskii-gui
                           
-        configure.args    --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio --enable-jit-compiler
+        configure.args    --disable-vosf --without-esd --without-mon --enable-sdl-video --enable-sdl-audio --enable-jit-compiler --enable-standalone-gui --with-gtk=no
+        
+        configure.ldflags-append    \
+                          -Wl,-no_pie
     }
 
     platform darwin powerpc {
@@ -75,6 +78,7 @@ if {${subport} eq "basiliskii"} {
         file mkdir ${destroot}${applications_dir}${basiliskii_dir}
         copy ${filespath}/BasiliskII_idiosyncracies.txt ${destroot}${applications_dir}${basiliskii_dir}
         copy ${worksrcpath}/BasiliskII.app ${destroot}${applications_dir}${basiliskii_dir}
+        file delete ${destroot}${prefix}/bin/BasiliskIIGUI
     }
 
 } elseif {${subport} eq "basiliskii-gui"} {
@@ -85,7 +89,7 @@ if {${subport} eq "basiliskii"} {
     long_description    ${description}
 
     depends_lib         port:gtk2
-    configure.args      --disable-vosf --without-esd --without-mon --enable-standalone-gui
+    configure.args      --disable-vosf --without-esd --without-mon --enable-standalone-gui --with-gtk=gtk2
     build.target        BasiliskIIGUI_app
     
     post-destroot {
