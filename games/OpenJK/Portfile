@@ -23,9 +23,11 @@ patchfiles          patch-code-rd-vanilla-gltext.diff \
                     patch-codemp-rd-vanilla-gltext.diff
                     
 post-destroot {
-        copy ${workpath}/build/OpenJK.app ${destroot}${applications_dir}
-        copy ${workpath}/build/'/OpenJK SP.app' ${destroot}${applications_dir}
-#        copy ${workpath}/build/openjkded.x86 ${destroot}${prefix}/bin
-}
+          move ${destroot}${prefix}/JediAcademy/openjk.x86.app/Contents/MacOS/rd-vanilla_x86.dylib \
+               ${destroot}${prefix}/JediAcademy/openjk.x86.app/Contents/MacOS/rd-vanilla_x86_64.dylib
 
-#destroot {}
+          move ${destroot}${prefix}/JediAcademy/openjk_sp.x86.app/Contents/MacOS/rdsp-vanilla_x86.dylib \
+               ${destroot}${prefix}/JediAcademy/openjk_sp.x86.app/Contents/MacOS/rdsp-vanilla_x86_64.dylib
+
+          move ${destroot}${prefix}/JediAcademy ${destroot}${applications_dir}
+}
