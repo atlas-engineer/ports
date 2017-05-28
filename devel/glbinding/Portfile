@@ -25,12 +25,12 @@ checksums               rmd160  1c95c08d50d0e14c890d890fbfb1d0c612c16562 \
                         sha256  2ce7d20d92703a855ce2ccf1f349d6721c0d9d8aab9da42aa303f0831290f77c
     
 # prevent failed builds on incompatible systems
-pre-fetch {
-    if {${os.platform} eq "darwin" && ${os.major} < 13} {
-        ui_error "Presently requires 10.9 or later (requires Thread-Local Storage)"
-        return -code error "incompatible Mac operating system version"
-    }
-}
+#pre-fetch {
+#    if {${os.platform} eq "darwin" && ${os.major} < 13} {
+#        ui_error "Presently requires 10.9 or later (requires Thread-Local Storage)"
+#        return -code error "incompatible Mac operating system version"
+#    }
+#}
 
 depends_build-append    port:py27-pystache \
                         port:glfw
