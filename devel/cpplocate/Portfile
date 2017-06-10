@@ -5,8 +5,8 @@ PortGroup           cmake 1.0
 PortGroup           cxx11 1.0
 PortGroup           github 1.0
 
-github.setup        cginternals cpplocate 7ba162fce3615fad03037eef05ff29d5bc430e26
-version             20161110
+github.setup        cginternals cpplocate 25ed8cd6e12c3cd5790dfba5dd743d9476b23dce
+version             20170509
 
 categories          devel
 platforms           darwin
@@ -17,16 +17,15 @@ description         Cross-platform C++ library providing tools for applications 
                     themselves, their data assets as well as dependant modules.
 long_description    ${description}
 
-checksums           rmd160  d2b83fb64e2a612dab25f6a49287452899151d78 \
-                    sha256  8a1c6cd485ccedcec19b465a32c671924a1975a782f557446a5f049163f70b89
+checksums           rmd160  b3bce9f31c09bc5cb1ec0c72928bc2db59bd1698 \
+                    sha256  86648294fde0f523cc5c4ea18b6801d9fd25c0b259ac5016021723cc4287d00c
                     
-# macports prefers the shared library option
 configure.args-append -DBUILD_SHARED_LIBS:BOOL=ON
-
 cmake.out_of_source yes
 
-# one patch to override folder layout logic to match macports
-patchfiles-append   patch-cpplocate-cmake-installdirs.diff
+# override folder layout logic to match macports expectations
+patchfiles-append   001-patch-cpplocate-cmake-installdirs.diff
+patchfiles-append   002-patch-cpplocate-cmake-files-dir.diff
 
 variant docs description "install documentation" {
     configure.args-append   -DOPTION_BUILD_DOCS:BOOL=ON
