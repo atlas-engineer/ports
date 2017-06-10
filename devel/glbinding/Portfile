@@ -5,35 +5,48 @@ PortGroup               cmake 1.0
 PortGroup               cxx11 1.0
 PortGroup               github 1.0
 
-github.setup            cginternals glbinding 2.1.1 v
+name                    glbinding
 categories              devel
 platforms               darwin
 maintainers             nomaintainer
 license                 MIT
 
-description             glbinding is a cross-platform C++ binding for OpenGL
-long_description        glbinding leverages modern C++11 features like enum classes, lambdas, and \
-                        variadic templates, instead of relying on macros. All OpenGL symbols are \
-                        real functions and variables. It provides type-safe parameters, per feature \
-                        API header, lazy function resolution, multi-context and multi-thread support, \
-                        global and local function callbacks, meta information about the generated OpenGL \
-                        binding and the OpenGL runtime, as well as tools and examples for quick-starting \
-                        your projects. Based on the OpenGL API specification (gl.xml) glbinding is \
-                        generated using python scripts and templates that can be easily adapted to fit custom needs.
+description             C++11 binding for OpenGL
 
-checksums               rmd160  1c95c08d50d0e14c890d890fbfb1d0c612c16562 \
-                        sha256  2ce7d20d92703a855ce2ccf1f349d6721c0d9d8aab9da42aa303f0831290f77c
-    
-# prevent failed builds on incompatible systems
-#pre-fetch {
-#    if {${os.platform} eq "darwin" && ${os.major} < 13} {
-#        ui_error "Presently requires 10.9 or later (requires Thread-Local Storage)"
-#        return -code error "incompatible Mac operating system version"
-#    }
-#}
+subport ${name}-devel {}
 
-depends_build-append    port:py27-pystache \
-                        port:glfw
+if {${subport} eq ${name}} {
+
+    # release
+
+    github.setup    cginternals ${name} 2.1.3 v
+    checksums       rmd160  6dbca24c1051586444e31dd744fb0f9c16abbd67 \
+                    sha256  9eaf95540e18d47135cf7139d82e2e3a948466125322bed137a22478ad8c986b
+
+    conflicts       ${name}-devel
+    long_description ${description}: \
+        This port follows the release version of ${name}, which is typically updated every 6 months. If for some reason this port does not build or function as desired, try the ${name}-devel port.
+
+} else {
+
+    # devel
+
+    github.setup    cginternals ${name} 9921d1276fc15de03978d0450cc42359394f40c2
+    version         20170522
+    checksums       rmd160 d1c47d8ce13ef86af86d649d39cc4aaee3df1ee9 \
+                    sha256 300e33d18316d9084d162c331a211d41346e469869183cdab0e604c93b6d8e30
+
+    conflicts       ${name}
+    long_description ${description}: \
+        This port follows the GIT master version of ${name}, which is typically updated every few days to weeks.
+
+}
+
+
+depends_build-append    port:python27 \
+                        port:py27-pystache \
+                        path:lib/libglfw.dylib:glfw
+
 configure.args-append   -DPYTHON_EXECUTABLE:FILEPATH=${prefix}/bin/python2.7
 
 cmake.out_of_source     yes
@@ -50,13 +63,13 @@ variant docs description "install documentation" {
     depends_build-append    port:doxygen
 }
 
-variant examples description "install examples without qt5 example" {
+variant examples description "install examples" {
     configure.args-append   -DOPTION_BUILD_EXAMPLES:BOOL=ON
     depends_run-append      port:glew \
     						port:cpplocate
 }
 
-variant qtexamples description "install examples including qt5 example" {
+variant qtexamples description "install qt5 examples" {
     configure.args-append   -DOPTION_BUILD_EXAMPLES:BOOL=ON
     configure.args-append   -DOPTION_BUILD_QT_EXAMPLES:BOOL=ON
     depends_run-append      port:glew \
