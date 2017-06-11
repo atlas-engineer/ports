@@ -9,7 +9,7 @@ categories          games
 platforms           darwin
 maintainers         gmail.com:ken.cunningham.webuse openmaintainer
 license             GPL-2+
-homepage            http://wl.widelands.org/
+homepage            https://wl.widelands.org/
 
 
 description         open-source real-time strategy game inspired by Settlers
@@ -53,6 +53,7 @@ if {${subport} eq ${name}} {
     # comment out for HEAD
     bzr.revision        8377
     
+    # no longer uses this aspect of libsdl2 as of 8337 (uses boost networking instead)
     depends_lib-delete  port:libsdl2_net
 
     conflicts       ${name}
@@ -67,7 +68,8 @@ configure.args      -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.a
 
 variant useglbinding description "use glbinding instead of glew for OpenGL bindings" {
     # for gl debugging. requires a new port, glbinding to be created first
-    depends_lib-append        path:lib/ibglbinding.2.1.3.dylib:glbinding
+    depends_lib-delete        port:glew
+    depends_lib-append        path:lib/ibglbinding.dylib:glbinding
     configure.args-append     -DOPTION_USE_GLBINDING:BOOL=ON
 }
 
