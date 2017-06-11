@@ -10,8 +10,6 @@ platforms           darwin
 maintainers         gmail.com:ken.cunningham.webuse openmaintainer
 license             GPL-2+
 homepage            https://wl.widelands.org/
-
-
 description         open-source real-time strategy game inspired by Settlers
 
 depends_lib         port:libsdl2 \
@@ -25,7 +23,7 @@ depends_lib         port:libsdl2 \
                     port:glew \
                     port:lua
 
-subport ${name}-devel {}
+subport             ${name}-devel {}
 
 if {${subport} eq ${name}} {
 
@@ -38,7 +36,8 @@ if {${subport} eq ${name}} {
     checksums           rmd160  5fd3e33dd0e9014811936a125d8f1b64607b2914 \
                         sha256  e511f9d26828a2b71b64cdfc6674e6e847543b2da73961ab882acca36c7c01a6
 
-    conflicts       ${name}-devel
+    conflicts           ${name}-devel
+
     long_description ${description}: \
         This port follows the release version of ${name}, which is typically updated every 6 months. If for some reason this port does not build or function as desired, try the ${name}-devel port.
 
@@ -53,21 +52,19 @@ if {${subport} eq ${name}} {
     # comment out for HEAD
     bzr.revision        8377
     
-    # no longer uses this aspect of libsdl2 as of 8337 (uses boost networking instead)
+    # no longer uses this aspect of libsdl2 as of 8377 (uses boost networking instead)
     depends_lib-delete  port:libsdl2_net
 
-    conflicts       ${name}
-    long_description ${description}: \
-        This port follows the master version of ${name}, which is typically updated every few days to weeks.
+    conflicts           ${name}
 
+    long_description ${description}: \
+        This port follows the master version of ${name}, which is typically updated every few weeks.
 }
 
 cmake.out_of_source yes
-configure.args      -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.app/Contents/MacOS"
-
+configure.args        -DCMAKE_INSTALL_PREFIX:PATH="${applications_dir}/Widelands.app/Contents/MacOS"
 
 variant useglbinding description "use glbinding instead of glew for OpenGL bindings" {
-    # for gl debugging. requires a new port, glbinding to be created first
     depends_lib-delete        port:glew
     depends_lib-append        path:lib/ibglbinding.dylib:glbinding
     configure.args-append     -DOPTION_USE_GLBINDING:BOOL=ON
