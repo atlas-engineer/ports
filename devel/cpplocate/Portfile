@@ -25,7 +25,6 @@ cmake.out_of_source yes
 
 # override folder layout logic to match macports expectations
 patchfiles-append   001-patch-cpplocate-cmake-installdirs.diff
-patchfiles-append   002-patch-cpplocate-cmake-files-dir.diff
 
 variant docs description "install documentation" {
     configure.args-append   -DOPTION_BUILD_DOCS:BOOL=ON
