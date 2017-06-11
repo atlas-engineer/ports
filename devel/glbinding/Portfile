@@ -53,7 +53,6 @@ cmake.out_of_source     yes
 
 # patch to override folder layout logic to match macports
 patchfiles-append       001-patch-glbinding-cmake-installdirs.diff
-patchfiles-append       002-patch-glbinding-cmake-files-dir.diff
 
 # patch to make qt example a separate option
 patchfiles-append       003-patch-glbinding-src-examples-cmakelists-optionglexamples.diff
