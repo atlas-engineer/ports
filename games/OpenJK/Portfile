@@ -3,8 +3,10 @@
 PortSystem          1.0
 PortGroup           cmake 1.0
 PortGroup           github 1.0
+PortGroup           cxx11 1.1
 
 github.setup        JACoders OpenJK 36b675920981d0e964cbc9c93cc7255eefdc4c3b
+name                openjk
 version             20170511
 categories          games
 platforms           darwin
@@ -19,15 +21,20 @@ checksums           rmd160  f5ad81f3ac10ec164c726accfe48733bece64b70 \
 
 cmake.out_of_source yes
 
+depends_lib         port:libsdl2 \
+                    port:libpng \
+                    port:zlib
+
 patchfiles          patch-code-rd-vanilla-gltext.diff \
-                    patch-codemp-rd-vanilla-gltext.diff
+                    patch-codemp-rd-vanilla-gltext.diff \
+                    patch-cmakelists-archfix.diff
                     
 post-destroot {
-          move ${destroot}${prefix}/JediAcademy/openjk.x86.app/Contents/MacOS/rd-vanilla_x86.dylib \
-               ${destroot}${prefix}/JediAcademy/openjk.x86.app/Contents/MacOS/rd-vanilla_x86_64.dylib
-
-          move ${destroot}${prefix}/JediAcademy/openjk_sp.x86.app/Contents/MacOS/rdsp-vanilla_x86.dylib \
-               ${destroot}${prefix}/JediAcademy/openjk_sp.x86.app/Contents/MacOS/rdsp-vanilla_x86_64.dylib
-
           move ${destroot}${prefix}/JediAcademy ${destroot}${applications_dir}
 }
+
+notes "
+To run this game, place the game folder named base from your original
+Star Wars Jedi Knight Jedi Academy game in 
+/Users/YOURNAME/Library/Application Support/OpenJK/
+"
