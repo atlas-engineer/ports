@@ -1,0 +1,49 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+PortSystem              1.0
+
+name                    openttd
+version                 1.7.1
+categories              games
+platforms               darwin
+license                 GPL-2
+maintainers             {gmail:ken.cunningham.webuse @kencu} openmaintainer
+
+description             \
+    An open source simulator based on the classic game Transport Tycoon Deluxe. \
+    It attempts to mimic the original game as closely as possible while extending it.
+long_description        ${description}
+homepage                https://www.openttd.org
+
+master_sites            https://binaries.openttd.org/releases/${version}/
+distfiles               ${name}-${version}-source${extract.suffix}
+worksrcdir              ${name}-${version}
+
+checksums               rmd160  832428f847324093156378ebafffe3c4f55dbfcd \
+                        sha256  9f7a5f5051dc9f43e8eec00bd56755a20846c8738ffcd4bb1f2e1eae334f3371
+                    
+patchfiles              patch-src-fileio-const-char.diff
+
+destroot.target         bundle
+
+depends_build-append    port:pkgconfig
+depends_lib-append      port:zlib \
+                        port:libpng \
+                        port:lzma \
+                        port:lzo2 \
+                        port:freetype \
+                        port:icu
+
+post-destroot {
+    xinstall -d -m 0755 ${destroot}${prefix}/share/openttd
+    move ${worksrcpath}/bundle/OpenTTD.app ${destroot}${applications_dir}/OpenTTD.app
+    move ${worksrcpath}/bundle/man/openttd.6.gz ${destroot}${prefix}/share/man/man6/openttd.6.gz
+    move ${worksrcpath}/bundle/docs ${destroot}${prefix}/share/openttd/docs
+    move ${worksrcpath}/bundle/known-bugs.txt ${destroot}${prefix}/share/openttd/docs/known-bugs.txt
+    move ${worksrcpath}/bundle/readme.txt ${destroot}${prefix}/share/openttd/docs/readme.txt
+}
+
+notes "
+The game dialog boxes are rather small when first run. To fix this, you can\
+open \"Game Options\" from the main screen, and select a different screen resolution\
+and Interface size to adjust these to your liking.
+"
