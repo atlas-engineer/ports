@@ -8,20 +8,18 @@ version                 0.9.22
 categories              games
 platforms               darwin
 license                 GPL-2
-maintainers             gmail:ken.cunningham.webuse openmaintainer
+maintainers             {gmail:ken.cunningham.webuse @kencu} openmaintainer
 
 description             Funny turn-based artillery game, featuring fighting Hedgehogs!
 long_description        ${description}
 homepage                https://www.hedgewars.org/
 
-master_sites            http://download.gna.org/${name}/
+master_sites            https://www.hedgewars.org/download/releases/
 use_bzip2               yes
-distfiles               ${name}-src-${version}
-worksrcdir              ${name}-src-${version}
+distname                ${name}-src-${version}
 
-checksums               md5     3718947ea69f57a76a3511678fb8173b \
-                        sha1    53c2530df88c11297f3c1f6fc85a45f317644fe2 \
-                        rmd160  359fd026643e69446121b94ba301646812353c19
+checksums               rmd160  359fd026643e69446121b94ba301646812353c19 \
+                        sha256  b699c8971ff420c3edd6533527ae2e99040f1e79207c9140826945bcf0e62192
 
 cmake.out_of_source     yes
 
@@ -38,7 +36,7 @@ depends_build-append    port:pkgconfig \
                         port:hs-zlib \
                         port:hs-random
                     
-depends_lib-append      port:ffmpeg \
+depends_lib-append      path:bin/ffmpeg:ffmpeg \
                         port:libogg \
                         port:libsdl \
                         port:libsdl_image \
@@ -58,29 +56,28 @@ configure.args-append   -DSKIPBUNDLE:BOOL=ON
 
 configure.args-append   -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin/qmake
 
+# use the pas2c converter to compile the pascal portions rather than fpc
+configure.args-append   -DBUILD_ENGINE_C:BOOL=ON
+
 # update two source files to enable building against the current ffmpeg variable and procedure names
 patchfiles-append       patch-0001-avwrapper-avframealloc-fix.diff
 patchfiles-append       patch-0002-LibavInteraction-fix.diff
 
+# the authours of this game have hardcoded the c++ library in several places and this needs
+# to be deleted for proper linking to the supporting dependencies on macports
+
 # replace the hard-coded link to libstdc++ in the hwc engine build script with proper link flags
 patchfiles-append       patch-0003-proj-hwc-CMakeLists-proper-link-flags.diff
 
-# remove the hard-coded link to libstdc++ in QTfrontend cmake build script, and add in link to correct stdlib
-# oddly it requires this link flag to be -lc++ or -lstdc++ -- setting -stdlib=libc++ or -stdlib=libstdc++
-# did not generate a proper link. Admittedly this is not standard, but works correctly on all tested systems
+# remove the hard-coded link to libstdc++ in QTfrontend build script with proper link flags
 patchfiles-append       patch-0004-remove-hardcoded-stdlib-and-iokit-QTfrontend.diff
-if { ${cxx_stdlib} eq "libc++"} {
-    configure.ldflags-append -lc++
-    } else {
-    configure.ldflags-append -lstdc++
- }
 
 # lan server build fails unless this haskell optimization flag is disabled
 # probably due to excessive recursion
 patchfiles-append       patch-0005-remove-haskell-spec-constr.diff
 
-# use the pas2c converter to compile the pascal portions rather than fpc
-configure.args-append   -DBUILD_ENGINE_C:BOOL=ON
+# remove clang search and compiler ID override which messes everything up during the build
+patchfiles-append       patch-0006-CMakeLists-delete-clang-search.diff
 
 post-destroot {
     move ${destroot}${workpath}/build/Hedgewars.app ${destroot}${applications_dir}/Hedgewars.app
