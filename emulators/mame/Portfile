@@ -101,9 +101,10 @@ destroot {
     delete ${destroot}${prefix}/share/mame/epub
 
     system -W ${worksrcpath}/docs "SPHINXBUILD=${prefix}/bin/sphinx-build-3.6 \
-                                  BUILDDIR=${destroot}${prefix}/share/man/man1 make -e man"
+                                  BUILDDIR=${destroot}${prefix}/share/temp make -e man"
 
-    delete ${destroot}${prefix}/share/man/man1/doctrees
+    move ${destroot}${prefix}/share/temp/man/MAME.1 ${destroot}${prefix}/share/man/man6/mame.6
+    delete ${destroot}${prefix}/share/temp
 }
 
 post-destroot {
