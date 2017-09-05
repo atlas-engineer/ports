@@ -28,6 +28,14 @@ patchfiles          patch-rendutil.cpp.diff
 # remove -Wundef which causes errors on older mac systems
 patchfiles-append   patch-genie-no-undef.diff
 
+depends_build-append \
+                    port:python36 \
+                    port:py36-sphinx \
+                    port:latexmk \
+                    port:texlive-latex-recommended \
+                    port:texlive-fonts-recommended \
+                    port:texlive-latex-extra
+
 depends_lib-append  \
                     port:expat \
                     port:flac \
@@ -39,10 +47,7 @@ depends_lib-append  \
                     port:portaudio \
                     port:portmidi \
                     port:sqlite3 \
-                    port:zlib \
-                    port:python36 \
-                    port:py36-sphinx \
-                    port:latexmk
+                    port:zlib
 
 use_configure       no
 
@@ -101,7 +106,6 @@ destroot {
     delete ${destroot}${prefix}/share/man/man1/doctrees
 }
 
-# need to verify this works correctly next build. didn't work right first time through
 post-destroot {
     ln -s ${prefix}/libexec/mame/mame64 ${destroot}${prefix}/bin/mame
     reinplace "s|/_files|_files|g" ${destroot}${prefix}/share/mame/html/index.html
