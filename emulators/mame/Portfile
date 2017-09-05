@@ -91,8 +91,6 @@ destroot {
     move ${destroot}${prefix}/share/mame/epub/MAMEDocumentation.epub ${destroot}${prefix}/share/mame/html/_files/MAME.epub
     copy ${destroot}${prefix}/share/mame/latex/MAME.pdf ${destroot}${prefix}/share/mame/html/_files
 
-    reinplace "s|/_files|_files|g" ${destroot}${prefix}/share/mame/html/index.html
-
     delete ${destroot}${prefix}/share/mame/doctrees
     delete ${destroot}${prefix}/share/mame/latex
     delete ${destroot}${prefix}/share/mame/epub
@@ -106,4 +104,5 @@ destroot {
 # need to verify this works correctly next build. didn't work right first time through
 post-destroot {
     ln -s ${prefix}/libexec/mame/mame64 ${destroot}${prefix}/bin/mame
+    reinplace "s|/_files|_files|g" ${destroot}${prefix}/share/mame/html/index.html
 }
