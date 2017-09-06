@@ -24,8 +24,6 @@ checksums           rmd160  a7a937074bbcc8a45dd4650465629c7eae021efd \
                     sha256  178dd59c5c681c6101a6bad27c8cfb584e35c2a39d99f3a9d865e9874bcb8a61
 worksrcdir          CutyCapt
 
-depends_lib         port:qt4-mac
-
 post-destroot {
     move "${worksrcpath}/CutyCapt.app/Contents/MacOS/CutyCapt" "${destroot}${prefix}/bin/cutycapt"
 }
