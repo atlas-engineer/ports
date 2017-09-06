@@ -1,0 +1,31 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+
+if {${os.platform} eq "darwin" && ${os.major} < 11} {
+    PortGroup           qmake 1.0
+} else {
+    PortGroup           qmake5 1.0
+}
+
+name                cutycapt
+version             0.0~svn10
+categories          www
+maintainers         {gmail:ken.cunningham.webuse @kencu} openmaintainer
+description         Converts web pages to vector/bitmap images using WebKit
+homepage            http://cutycapt.sourceforge.net/
+platforms           darwin
+license             GPL-2.1+
+long_description    ${description}
+
+master_sites        https://mirrorservice.org/sites/ftp.debian.org/debian/pool/main/c/cutycapt/
+distname            cutycapt_${version}.orig
+checksums           rmd160  a7a937074bbcc8a45dd4650465629c7eae021efd \
+                    sha256  178dd59c5c681c6101a6bad27c8cfb584e35c2a39d99f3a9d865e9874bcb8a61
+worksrcdir          CutyCapt
+
+depends_lib         port:qt4-mac
+
+post-destroot {
+    move "${worksrcpath}/CutyCapt.app/Contents/MacOS/CutyCapt" "${destroot}${prefix}/bin/cutycapt"
+}
