@@ -1,0 +1,229 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
+
+# We have an umbrella radar tracking webkit-gtk issues on OS X.  Please relate
+# any future issues with this tracker.
+# http://bugs.webkit.org/show_bug.cgi?id=126492
+
+PortSystem          1.0
+PortGroup           active_variants 1.1
+PortGroup           cmake 1.0
+PortGroup           compiler_blacklist_versions 1.0
+PortGroup           cxx11 1.1
+
+name                webkit2-gtk
+conflicts           webkit2-gtk-devel
+version             2.14.2
+revision            2
+description         Apple's WebKit2 HTML rendering library for GTK+3 (with optional support for GTK+2 plugins)
+long_description    ${description}
+maintainers         {jeremyhu @jeremyhu} {devans @dbevans}
+categories          www gnome
+platforms           darwin freebsd
+license             LGPL-2+ BSD
+homepage            http://webkitgtk.org/
+master_sites        http://webkitgtk.org/releases/
+
+use_xz              yes
+distname            webkitgtk-${version}
+
+dist_subdir         webkit-gtk
+
+checksums           rmd160  3fea1696539ba305367e36af803ce1a934b99b0d \
+                    sha256  2edbcbd5105046aea55af9671c4de8deedb5b0e3567c618034d440a760675556
+
+# don't overwrite build dependencies provided by cmake portgroup
+depends_build-append \
+                    port:gperf \
+                    port:gtk-doc \
+                    port:pkgconfig \
+                    port:python27 \
+                    port:py27-simplejson
+
+depends_lib         port:atk \
+                    port:at-spi2-atk \
+                    port:bison \
+                    path:lib/pkgconfig/cairo.pc:cairo \
+                    port:flex \
+                    port:fontconfig \
+                    port:freetype \
+                    port:enchant \
+                    port:geoclue2 \
+                    path:lib/pkgconfig/glib-2.0.pc:glib2 \
+                    port:gobject-introspection \
+                    port:gstreamer1 \
+                    port:gstreamer1-gst-plugins-bad \
+                    port:gstreamer1-gst-plugins-base \
+                    port:gstreamer1-gst-plugins-good \
+                    port:gtk3 \
+                    port:harfbuzz-icu \
+                    port:hyphen \
+                    port:icu \
+                    port:libnotify \
+                    port:libpng \
+                    port:libsecret \
+                    port:libsoup \
+                    port:libxml2 \
+                    port:libxslt \
+                    port:sqlite3 \
+                    port:webp \
+                    port:zlib
+
+# PR-152650-2.patch: WIP to re-enable gtk-doc support
+# PR-153138.patch: https://bugs.webkit.org/show_bug.cgi?id=153138
+# PR-157554.patch: https://bugs.webkit.org/show_bug.cgi?id=157554
+# PR-157574.patch: https://bugs.webkit.org/show_bug.cgi?id=157574
+patchfiles-append \
+    PR-152650-2.patch \
+    PR-153138.patch \
+    PR-157554.patch \
+    PR-157574.patch
+
+# Build out-of-tree
+configure.post_args     ../${worksrcdir}
+default configure.dir   {${workpath}/build}
+default build.dir       {${workpath}/build}
+
+configure.args-append \
+    -DPORT=GTK \
+    -DUSE_SYSTEM_MALLOC=ON \
+    -DENABLE_INTROSPECTION=ON \
+    -DENABLE_MINIBROWSER=OFF \
+    -DENABLE_PLUGIN_PROCESS_GTK2=OFF \
+    -DENABLE_VIDEO=ON
+
+# TODO: File a bug about this not working
+configure.args-append -DENABLE_GTKDOC=OFF
+
+# <rdar://problem/24031030>
+configure.optflags  -Os
+
+# clang 3.4, 503.0.35, and 600.0.57 (error: call to 'make_unique' is ambiguous, error: call to 'exchange' is ambiguous)
+# compiler.blacklist-append {clang < 602} macports-clang-3.4
+# clang 3.3 (error: no type named 'make_index_sequence' in namespace 'std')
+compiler.fallback-append macports-clang-4.0
+compiler.blacklist-append {clang < 602} macports-clang-3.4 macports-clang-3.3
+
+pre-configure {
+    if {![variant_isset quartz] && ![variant_isset x11]} {
+        error "Either +x11 or +quartz is required"
+    }
+}
+
+post-configure {
+    # https://bugs.webkit.org/show_bug.cgi?id=153176
+    reinplace {s|\.\./\.\./lib/libWTFGTK\.a||} \
+        ${build.dir}/Source/WebKit2/CMakeFiles/WebKit2.dir/link.txt
+    reinplace {s|\.\./\.\./lib/libbmalloc\.a||} \
+        ${build.dir}/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/link.txt
+    reinplace {s|[\./]*\.\./lib/lib[^\.]*\.a||g} \
+        ${build.dir}/Source/JavaScriptCore/CMakeFiles/LLIntOffsetsExtractor.dir/link.txt \
+        ${build.dir}/Source/JavaScriptCore/shell/CMakeFiles/jsc.dir/link.txt \
+        ${build.dir}/Source/JavaScriptCore/shell/CMakeFiles/testb3.dir/link.txt \
+        ${build.dir}/Source/WebKit2/CMakeFiles/DatabaseProcess.dir/link.txt \
+        ${build.dir}/Source/WebKit2/CMakeFiles/NetworkProcess.dir/link.txt \
+        ${build.dir}/Source/WebKit2/CMakeFiles/webkit2gtkinjectedbundle.dir/link.txt \
+        ${build.dir}/Source/WebKit2/CMakeFiles/WebProcess.dir/link.txt
+    if {[variant_isset x11]} {
+        # ENABLE_PLUGIN_PROCESS is only enabled with +x11
+        reinplace {s|[\./]*\.\./lib/lib[^\.]*\.a||g} \
+            ${build.dir}/Source/WebKit2/CMakeFiles/PluginProcess.dir/link.txt
+
+        if {[variant_isset gtk2]} {
+            reinplace {s|\.\./\.\./lib/libWTFGTK\.a||} \
+                ${build.dir}/Source/WebKit2/CMakeFiles/WebKitPluginProcess2.dir/link.txt
+            reinplace {s|-Wl,-all_load||g} \
+                ${build.dir}/Source/WebKit2/CMakeFiles/WebKitPluginProcess2.dir/link.txt
+        }
+    }
+    if {[variant_isset minibrowser]} {
+        reinplace {s|[\./]*\.\./lib/lib[^\.]*\.a||g} \
+            ${build.dir}/Tools/MiniBrowser/gtk/CMakeFiles/MiniBrowser.dir/link.txt
+    }
+
+    # https://bugs.webkit.org/show_bug.cgi?id=153192
+    reinplace {s|\.\./\.\./lib/libWTFGTK\.a|-Wl,-all_load ../../lib/libWTFGTK.a|} \
+        ${build.dir}/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/link.txt
+}
+
+# https://trac.macports.org/ticket/41560#comment:2
+configure.cflags-append     -ftemplate-depth=256
+configure.cxxflags-append   -ftemplate-depth=256
+
+# fix build with clang on newer systems
+# https://trac.macports.org/ticket/54798
+if {${os.platform} eq "darwin" && ${os.major} > 13} {
+    configure.cxxflags-append    -std=c++14
+}
+
+
+if {![variant_isset quartz]} {
+    default_variants-append +x11 +gtk2
+}
+
+# fix build on older systems
+if {${os.platform} eq "darwin" && ${os.major} < 13} {
+    
+    # add dep for newer ruby and spec this for build
+    # https://trac.macports.org/ticket/52016
+    depends_build-append    port:ruby24
+    configure.args-append   -DRUBY_EXECUTABLE=${prefix}/bin/ruby2.4
+
+    # fix missing PRId64 definitions on systems
+    # that don't define __STDC_FORMAT_MACROS by default
+    # https://bugs.webkit.org/show_bug.cgi?id=156596
+    # https://trac.macports.org/ticket/52016
+    patchfiles-append patch-snowleopard-cmakelists-stdcformatmacros.diff
+
+    # fix a Cursor name collision with Carbon API
+    # https://trac.macports.org/ticket/52016
+    if {[variant_isset x11]} {
+        patchfiles-append patch-snowleopard-npruntime-redefine-cursor.diff
+    }
+    
+    # special case: fix build on 10.6 with macports-libstdc++
+    # contents of snowmath.h should someday become part of gcc6 cmath
+    if { ${configure.cxx_stdlib} eq "macports-libstdc++"  && ${os.major} < 11 } {
+        configure.cxxflags-append -D_GLIBCXX_USE_C99_MATH_TR1=1
+        configure.cxxflags-append -include ${portpath}/${filesdir}/snowmath.h
+    }
+}
+
+variant quartz conflicts x11 gtk2 {
+    require_active_variants port:gtk3 quartz
+
+    configure.args-append \
+        -DENABLE_QUARTZ_TARGET=ON \
+        -DENABLE_X11_TARGET=OFF \
+        -DENABLE_OPENGL=OFF \
+        -DENABLE_GRAPHICS_CONTEXT_3D=OFF
+}
+
+variant x11 conflicts quartz {
+    require_active_variants port:gtk3 x11
+
+    configure.args-append \
+        -DENABLE_QUARTZ_TARGET=OFF \
+        -DENABLE_X11_TARGET=ON \
+        -DENABLE_OPENGL=ON
+
+    depends_lib-append \
+        port:mesa \
+        port:xorg-libXt
+}
+
+variant minibrowser description {Build and install MiniBrowser (for testing)} {
+    configure.args-delete   -DENABLE_MINIBROWSER=OFF
+    configure.args-append   -DENABLE_MINIBROWSER=ON
+}
+
+variant gtk2 conflicts quartz description {Enable support for GTK+2 plugins} {
+    require_active_variants port:gtk2 x11
+
+    depends_lib-append      port:gtk2
+    configure.args-delete   -DENABLE_PLUGIN_PROCESS_GTK2=OFF
+    configure.args-append   -DENABLE_PLUGIN_PROCESS_GTK2=ON
+}
+
+livecheck.type      regex
+livecheck.url       http://webkitgtk.org/releases/
+livecheck.regex     "webkitgtk-(\\d+\\.\\d*\[02468\](?:\\.\\d+)*)"
