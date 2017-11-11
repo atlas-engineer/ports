@@ -31,14 +31,13 @@ depends_build-append \
                     port:gnome-common \
                     port:autoconf \
                     port:automake \
-                    port:libtool
+                    port:libtool \
+                    port:appstream-glib \
+                    port:itstool \
+                    port:yelp-tools
 
-depends_build-append    port:appstream-glib \
-                        port:itstool \
-                        port:yelp-tools
 
-
-depends_lib-append         port:desktop-file-utils \
+depends_lib-append  port:desktop-file-utils \
                     port:gtk3 \
                     port:gnome-desktop \
                     port:libxslt\
@@ -51,18 +50,11 @@ depends_lib-append         port:desktop-file-utils \
                     port:avahi \
                     port:xorg-libX11 \
                     port:iso-codes \
-                    port:libhttpseverywhere
-
-depends_lib-append      path:lib/pkgconfig/webkit2gtk-4.0.pc:webkit2-gtk
+                    port:libhttpseverywhere \
+                    path:lib/pkgconfig/webkit2gtk-4.0.pc:webkit2-gtk
 
 depends_run         port:gnome-themes-standard \
                     port:gnome-keyring
-
-# reconfigure using our intltool.m4 and upstream autogen.sh for intltool 0.51 compatibility
-
-pre-configure {
-    copy -force ${prefix}/share/aclocal/intltool.m4 ${worksrcpath}/m4
-}
 
 
 configure.cmd       meson
@@ -77,11 +69,6 @@ build.target
 destroot.dir        ${worksrcpath}/build
 destroot.cmd        DESTDIR=${destroot} ninja
 destroot.destdir
-
-post-activate {
-    system "${prefix}/bin/update-desktop-database -q ${prefix}/share/applications"
-    system "${prefix}/bin/glib-compile-schemas ${prefix}/share/glib-2.0/schemas"
-}
 
 # meson ninja backend improperly sets shared library install name
 # based on build_dir rather than install_dir
@@ -113,7 +100,11 @@ post-destroot {
 
     system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
     system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
+}
 
+post-activate {
+    system "${prefix}/bin/update-desktop-database -q ${prefix}/share/applications"
+    system "${prefix}/bin/glib-compile-schemas ${prefix}/share/glib-2.0/schemas"
 }
 
 
