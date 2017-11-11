@@ -95,24 +95,24 @@ post-destroot {
     set libname ${prefix}/lib/epiphany/libephysync.dylib
     system "install_name_tool -id ${libname} ${destroot}${libname}"
     
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephysync.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephysync.dylib"
 
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/bin/epiphany"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/bin/epiphany"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/bin/epiphany"
 
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
 
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
 
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
-    system "install_name_tool -change ${prefix}/var/macports/build/_opt_myports_gnome_epiphany/epiphany/work/epiphany-3.26.2/build/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
 
 }
 
