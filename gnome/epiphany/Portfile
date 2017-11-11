@@ -34,8 +34,8 @@ depends_build-append \
                     port:libtool
 
 depends_build-append    port:appstream-glib \
-						port:itstool \
-						port:yelp-tools
+                        port:itstool \
+                        port:yelp-tools
 
 
 depends_lib-append         port:desktop-file-utils \
@@ -95,24 +95,24 @@ post-destroot {
     set libname ${prefix}/lib/epiphany/libephysync.dylib
     system "install_name_tool -id ${libname} ${destroot}${libname}"
     
-    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
     system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
-    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephysync.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephysync.dylib"
 
-    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/bin/epiphany"
-    system "install_name_tool -change ${build.dir}/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib      ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/bin/epiphany"
     system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/bin/epiphany"
 
     system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
-    system "install_name_tool -change ${build.dir}/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
-    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib      ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
 
     system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
-    system "install_name_tool -change ${build.dir}/src/libephymain.dylib ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
-    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib      ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
 
     system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
-    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
 
 }
 
