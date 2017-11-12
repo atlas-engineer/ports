@@ -34,7 +34,8 @@ depends_build-append \
                     port:libtool \
                     port:appstream-glib \
                     port:itstool \
-                    port:yelp-tools
+                    port:yelp-tools \
+                    port:python36
 
 
 depends_lib-append  port:desktop-file-utils \
@@ -51,11 +52,18 @@ depends_lib-append  port:desktop-file-utils \
                     port:xorg-libX11 \
                     port:iso-codes \
                     port:libhttpseverywhere \
-                    path:lib/pkgconfig/webkit2gtk-4.0.pc:webkit2-gtk
+                    path:lib/pkgconfig/webkit2gtk-4.0.pc:webkit2-gtk \
+                    port:gmp
 
 depends_run         port:gnome-themes-standard \
                     port:gnome-keyring
 
+
+# specify a python3 version
+patchfiles          patch-post-install-python.diff
+post-patch {
+    reinplace "s|@@PYTHON3@@|${prefix}/bin/python3.6|g" post_install.py
+}
 
 configure.cmd       meson
 configure.post_args . build
