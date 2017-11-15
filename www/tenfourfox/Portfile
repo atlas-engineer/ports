@@ -32,9 +32,10 @@ autoconf.cmd        autoconf213
 
 use_configure       no
 
-
-
-
+#select the proper config file
+post-extract {
+    file copy ${worksrcpath}/G5-nostrip.mozcfg ${worksrcpath}/.mozconfig
+}
 
 
 ##########  fixes to try building TenFourFox on 10.6.8 ###########
