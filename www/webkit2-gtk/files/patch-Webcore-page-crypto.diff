@@ -7,7 +7,7 @@ index ed1278b..f94db1b 100644
  #include "Crypto.h"
  
 -#if OS(DARWIN)
-+#if OS(DARWIN) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
++#if OS(DARWIN) && __MAC_OS_X_VERSION_MIN_REQUIRED > 1090
  #include "CommonCryptoUtilities.h"
  #endif
  #include "Document.h"
@@ -16,7 +16,7 @@ index ed1278b..f94db1b 100644
      if (array.byteLength() > 65536)
          return Exception { QuotaExceededError };
 -#if OS(DARWIN)
-+#if OS(DARWIN) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
++#if OS(DARWIN) && __MAC_OS_X_VERSION_MIN_REQUIRED > 1090
      int rc = CCRandomCopyBytes(kCCRandomDefault, array.baseAddress(), array.byteLength());
      RELEASE_ASSERT(rc == kCCSuccess);
  #else

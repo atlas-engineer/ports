@@ -82,6 +82,10 @@ patchfiles-append \
     patch-bundle-link-webcore.diff \
     patch-fix-include-path.diff
 
+# Apple internal security libraries are available only on new systems
+patchfiles-append  patch-Webcore-page-crypto.diff
+
+
 
 # Build out-of-tree
 configure.post_args     ../${worksrcdir}
@@ -159,43 +163,28 @@ post-configure {
 configure.cflags-append     -ftemplate-depth=256
 configure.cxxflags-append   -ftemplate-depth=256
 
-# fairly sure this is no longer needed -- delete if that proves correct
-# fix build with clang on newer systems
-# https://trac.macports.org/ticket/54798
-# if {${os.platform} eq "darwin" && ${os.major} > 13} {
-#    configure.cxxflags-append    -std=c++14
-# }
-
-
 if {![variant_isset quartz]} {
     default_variants-append +x11 +gtk2
 }
 
 # fix build on older systems
-if {${os.platform} eq "darwin" && ${os.major} < 13} {
+if {${os.platform} eq "darwin" && ${os.major} <= 13} {
+
 
     # gl cocoa build continues to fail due to use of API not available on darwin 12 or earlier
     # so gstreamergl is not available at present for darwin 12 or earlier
     configure.args-append -DUSE_GSTREAMER_GL=OFF
     
-    # the following work around the fact that webkit2-gtk running on darwin 
-    # uses security features of MacOS 10.7+ in several places
-    if { ${os.major} < 11 } {
+    # ENABLE_SUBTLE_CRYPTO used to be off by default, but now is on by default
+    # there are > 100 instances of #if ENABLE(SUBTLE_CRYPTO)
+    # fails up to 10.13
+    configure.args-append -DENABLE_SUBTLE_CRYPTO=OFF
 
-        # ENABLE_SUBTLE_CRYPTO used to be off by default, but now is on by default
-        # there are > 100 instances of #if ENABLE(SUBTLE_CRYPTO)
-        # may or may not be able to work without 10.7 features
-        configure.args-append -DENABLE_SUBTLE_CRYPTO=OFF
-        
-        # the darwin build uses 10.7+ only security features, but 
-        # the unix version does not, and seems to build OK so use that
-        # the ifdefs were cumbersome, so for now I just stripped those out and left
-        # the unix build behind - FIXME: sort the ifdefs out
-        patchfiles-append   patch-WTF-wtf-Randomdevice.diff
-    
-        # disable 10.7+ only security features
-        patchfiles-append   patch-Webcore-page-crypto.diff
-    }
+    # the darwin build uses 10.7+ only security features, but 
+    # the unix version does not, and seems to build OK so use that
+    # the ifdefs were cumbersome, so for now I just stripped those out and left
+    # the unix build behind - FIXME: sort the ifdefs out
+    patchfiles-append   patch-WTF-wtf-Randomdevice.diff
 
     # add dep for newer ruby and spec this for build
     # https://trac.macports.org/ticket/52016
