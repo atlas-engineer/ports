@@ -2,9 +2,10 @@
 
 PortSystem              1.0
 PortGroup               cmake 1.0
+PortGroup               conflicts_build 1.0
 
 name                    hedgewars
-version                 0.9.22
+version                 0.9.23
 categories              games
 platforms               darwin
 license                 GPL-2
@@ -18,8 +19,8 @@ master_sites            https://www.hedgewars.org/download/releases/
 use_bzip2               yes
 distname                ${name}-src-${version}
 
-checksums               rmd160  359fd026643e69446121b94ba301646812353c19 \
-                        sha256  b699c8971ff420c3edd6533527ae2e99040f1e79207c9140826945bcf0e62192
+checksums               rmd160  25919e6d8d170d2873e32ebacbe3811526edbd10 \
+                        sha256  da2e4908042be56d1c0f3cb80a355bde7f0a49f675b050a03228cc3fb22aae89
 
 cmake.out_of_source     yes
 
@@ -28,13 +29,16 @@ depends_build-append    port:pkgconfig \
                         port:hs-vector \
                         port:hs-bytestring-show \
                         port:hs-network \
-                        port:hs-dataenc \
                         port:hs-hslogger \
                         port:hs-utf8-string \
                         port:hs-sha \
                         port:hs-entropy \
                         port:hs-zlib \
-                        port:hs-random
+                        port:hs-random \
+                        port:hs-conduit \
+                        port:hs-regex-tdfa
+                        
+conflicts_build         hs-dataenc
                     
 depends_lib-append      path:bin/ffmpeg:ffmpeg \
                         port:libogg \
@@ -59,15 +63,8 @@ configure.args-append   -DQT_QMAKE_EXECUTABLE:FILEPATH=${prefix}/libexec/qt4/bin
 # use the pas2c converter to compile the pascal portions rather than fpc
 configure.args-append   -DBUILD_ENGINE_C:BOOL=ON
 
-# update two source files to enable building against the current ffmpeg variable and procedure names
-patchfiles-append       patch-0001-avwrapper-avframealloc-fix.diff
-patchfiles-append       patch-0002-LibavInteraction-fix.diff
-
-# the authours of this game have hardcoded the c++ library in several places and this needs
-# to be deleted for proper linking to the supporting dependencies on macports
-
-# replace the hard-coded link to libstdc++ in the hwc engine build script with proper link flags
-patchfiles-append       patch-0003-proj-hwc-CMakeLists-proper-link-flags.diff
+# don't build server
+configure.args-append   -DNOSERVER:BOOL=ON
 
 # remove the hard-coded link to libstdc++ in QTfrontend build script with proper link flags
 patchfiles-append       patch-0004-remove-hardcoded-stdlib-and-iokit-QTfrontend.diff
