@@ -82,9 +82,6 @@ patchfiles-append \
     patch-bundle-link-webcore.diff \
     patch-fix-include-path.diff
 
-# Apple internal security libraries are available only on new systems
-patchfiles-append  patch-Webcore-page-crypto.diff
-
 # Build out-of-tree
 configure.post_args     ../${worksrcdir}
 default configure.dir   {${workpath}/build}
@@ -168,6 +165,9 @@ if {![variant_isset quartz]} {
 # fix build on older systems
 if {${os.platform} eq "darwin" && ${os.major} <= 13} {
 
+    # Apple internal security libraries are available only on new systems
+    patchfiles-append  patch-Webcore-page-crypto.diff
+
     # gl cocoa build continues to fail due to use of API not available on darwin 12 or earlier
     # so gstreamergl is not available at present for darwin 12 or earlier
     configure.args-append -DUSE_GSTREAMER_GL=OFF
@@ -177,9 +177,9 @@ if {${os.platform} eq "darwin" && ${os.major} <= 13} {
     # fails up to darwin 13
     configure.args-append -DENABLE_SUBTLE_CRYPTO=OFF
 
-    # the darwin build uses 10.7+ only security features, but 
+    # the darwin build uses security features that were Apple internal only, but 
     # the unix version does not, and seems to build OK so use that
-    # the ifdefs were cumbersome, so for now I just stripped those out and left
+    # the ifdefs were too cumbersome to sort out, so for now I just stripped those out and left
     # the unix build behind - FIXME: sort the ifdefs out
     patchfiles-append   patch-WTF-wtf-Randomdevice.diff
 
