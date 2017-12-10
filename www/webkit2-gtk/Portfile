@@ -78,9 +78,15 @@ patchfiles-append \
     PR-157574.patch \
     PR-176870.patch \
     patch-disable-mach-exceptions.diff \
-    patch-ramsize.diff \
     patch-bundle-link-webcore.diff \
     patch-fix-include-path.diff
+    
+# Source/WTF/wtf/RAMSize.cpp has changed, and the Darwin parts were
+# stripped out. Replace it with the previous version
+patchfiles-append \
+    patch-ramsize.diff
+
+
 
 # Build out-of-tree
 configure.post_args     ../${worksrcdir}
@@ -165,7 +171,7 @@ if {![variant_isset quartz]} {
 # fix build on older systems
 if {${os.platform} eq "darwin" && ${os.major} <= 13} {
 
-    # Apple internal security libraries are available only on new systems
+    # disable Apple internal security libraries, available only on new systems
     patchfiles-append  patch-Webcore-page-crypto.diff
 
     # gl cocoa build continues to fail due to use of API not available on darwin 12 or earlier
