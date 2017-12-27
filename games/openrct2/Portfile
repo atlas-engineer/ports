@@ -29,12 +29,20 @@ if { ${os.platform} eq "darwin" && ${os.major} < 15 } {
 #        return -code error "incompatible OS version"
     }
     
-    patchfiles-append patch-scr-openrct2-platfrom-posix-const-delete.diff
-    patchfiles-append patch-src-openrct2-common-static-assert.diff
-    patchfiles-append patch-src-openrct2-core-filescanner-const.diff
-    patchfiles-append patch-src-openrct2-platform-macosm-fixups.diff
-    patchfiles-append patch-src-openrct2ui-uicontext.mac.diff
+    if {${os.major} < 11 } {    
+        patchfiles-append patch-src-openrct2-common-strnlen.diff
+    }
     
+    patchfiles-append patch-src-openrct2-common-static-assert.diff
+
+    patchfiles-append patch-scr-openrct2-platfrom-posix-const-delete.diff
+    patchfiles-append patch-src-openrct2-core-filescanner-const.diff
+
+    patchfiles-append patch-src-openrct2-platform-macosm-fixups.diff
+
+    patchfiles-append patch-src-openrct2ui-uicontext.mac.diff
+
+
     configure.cflags-append -framework AppKit -framework Foundation
     configure.cflags-append -Wno-unused-command-line-argument
     configure.cppflags-append -DTARGET_OS_TV=0

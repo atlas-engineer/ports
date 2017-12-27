@@ -1,0 +1,22 @@
+--- src/openrct2/common.h.orig	2017-12-27 12:37:38.000000000 -0800
++++ src/openrct2/common.h	2017-12-27 12:38:21.000000000 -0800
+@@ -224,6 +224,19 @@
+     #define RESTRICT
+ #endif
+ 
++static inline size_t
++strnlen(const char *s, size_t maxlen)
++{
++	size_t len;
++
++	for (len = 0; len < maxlen; len++, s++) {
++		if (!*s)
++			break;
++	}
++	return (len);
++}
++
++
+ #define assert_struct_size(x, y) static_assert(sizeof(x) == (y), "Improper struct size")
+ 
+ #ifdef PLATFORM_X86
