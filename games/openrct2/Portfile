@@ -47,7 +47,7 @@ platform darwin {
 
 
     configure.cflags-append   -framework AppKit -framework Foundation
-    configure.cppflags-append   -Wno-unused-command-line-argument
+    configure.cppflags-append -Wno-unused-command-line-argument
     configure.cppflags-append -DTARGET_OS_TV=0
     configure.cppflags-append -Wno-abstract-final-class
 }
