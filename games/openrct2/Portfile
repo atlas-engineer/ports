@@ -23,10 +23,13 @@ checksums           rmd160  72f2311e1716595265bed718fb57271cbdd69a04 \
 
 # requires 10.11 or newer at present
 # see https://trac.macports.org/ticket/55591
-if { ${os.platform} eq "darwin" && ${os.major} < 11 } {
-    pre-fetch {
-#        ui_error "${name} requires OS X 10.7 or later"
-#        return -code error "incompatible OS version"
+platform darwin {
+
+    if {${os.major} < 11 }
+		pre-fetch {
+	#        ui_error "${name} requires OS X 10.7 or later"
+	#        return -code error "incompatible OS version"
+		}
     }
     
     if {${os.major} < 11 } {    
