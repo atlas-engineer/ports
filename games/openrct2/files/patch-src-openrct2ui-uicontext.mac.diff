@@ -9,8 +9,8 @@
                  if ([NSWindow respondsToSelector:@selector(setAllowsAutomaticWindowTabbing:)]) {
                      [NSWindow setAllowsAutomaticWindowTabbing:NO];
                  }
-+#endif
              }
++#endif
          }
  
 @@ -85,7 +87,7 @@

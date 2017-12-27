@@ -23,9 +23,9 @@ checksums           rmd160  72f2311e1716595265bed718fb57271cbdd69a04 \
 
 # requires 10.11 or newer at present
 # see https://trac.macports.org/ticket/55591
-if { ${os.platform} eq "darwin" && ${os.major} < 15 } {
+if { ${os.platform} eq "darwin" && ${os.major} < 11 } {
     pre-fetch {
-#        ui_error "${name} requires OS X 10.11 or later"
+#        ui_error "${name} requires OS X 10.7 or later"
 #        return -code error "incompatible OS version"
     }
     
@@ -33,19 +33,20 @@ if { ${os.platform} eq "darwin" && ${os.major} < 15 } {
         patchfiles-append patch-src-openrct2-common-strnlen.diff
     }
     
+    if {${os.major} < 14 } {    
+        patchfiles-append patch-scr-openrct2-platfrom-posix-const-delete.diff
+        patchfiles-append patch-src-openrct2-core-filescanner-const.diff
+    }
+
     patchfiles-append patch-src-openrct2-common-static-assert.diff
-
-    patchfiles-append patch-scr-openrct2-platfrom-posix-const-delete.diff
-    patchfiles-append patch-src-openrct2-core-filescanner-const.diff
-
     patchfiles-append patch-src-openrct2-platform-macosm-fixups.diff
-
     patchfiles-append patch-src-openrct2ui-uicontext.mac.diff
 
 
-    configure.cflags-append -framework AppKit -framework Foundation
-    configure.cflags-append -Wno-unused-command-line-argument
+    configure.cflags-append   -framework AppKit -framework Foundation
+    configure.cppflags-append   -Wno-unused-command-line-argument
     configure.cppflags-append -DTARGET_OS_TV=0
+    configure.cppflags-append -Wno-abstract-final-class
 }
 
 depends_build-append \
