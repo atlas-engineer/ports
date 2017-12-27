@@ -1,0 +1,24 @@
+--- src/openrct2-ui/UiContext.macOS.mm.orig	2017-12-27 12:01:02.000000000 -0800
++++ src/openrct2-ui/UiContext.macOS.mm	2017-12-27 12:09:07.000000000 -0800
+@@ -36,10 +36,12 @@
+     public:
+         macOSContext()
+         {
++#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
+             @autoreleasepool {
+                 if ([NSWindow respondsToSelector:@selector(setAllowsAutomaticWindowTabbing:)]) {
+                     [NSWindow setAllowsAutomaticWindowTabbing:NO];
+                 }
++#endif
+             }
+         }
+ 
+@@ -85,7 +87,7 @@
+                     directory = filePath.stringByDeletingLastPathComponent;
+                     NSString *basename = filePath.lastPathComponent;
+                     panel = [NSSavePanel savePanel];
+-                    panel.nameFieldStringValue = [NSString stringWithFormat:@"%@.%@", basename, extensions.firstObject];
++                    panel.nameFieldStringValue = [NSString stringWithFormat:@"%@.%@", basename, extensions[0]];
+                 }
+                 else if (desc.Type == FILE_DIALOG_TYPE::OPEN)
+                 {

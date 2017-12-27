@@ -1,0 +1,11 @@
+--- src/openrct2/core/FileScanner.cpp.orig	2017-12-27 11:10:02.000000000 -0800
++++ src/openrct2/core/FileScanner.cpp	2017-12-27 11:10:51.000000000 -0800
+@@ -321,7 +321,7 @@
+     }
+ 
+ private:
+-    static sint32 FilterFunc(const struct dirent * d)
++    static sint32 FilterFunc( struct dirent * d)
+     {
+         return 1;
+     }

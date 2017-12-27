@@ -1,0 +1,20 @@
+--- src/openrct2/platform/posix.c.orig	2017-12-27 11:03:26.000000000 -0800
++++ src/openrct2/platform/posix.c	2017-12-27 11:03:40.000000000 -0800
+@@ -298,7 +298,7 @@
+ 
+ char *g_file_pattern;
+ 
+-static sint32 winfilter(const struct dirent *d)
++static sint32 winfilter( struct dirent *d)
+ {
+     sint32 entry_length = strnlen(d->d_name, MAX_PATH);
+     char *name_upper = malloc(entry_length + 1);
+@@ -454,7 +454,7 @@
+     enumFileInfo->active = 0;
+ }
+ 
+-static sint32 dirfilter(const struct dirent *d)
++static sint32 dirfilter( struct dirent *d)
+ {
+     if (d->d_name[0] == '.') {
+         return 0;
