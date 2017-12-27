@@ -21,14 +21,21 @@ long_description    ${description} A construction and management simulation \
 checksums           rmd160  72f2311e1716595265bed718fb57271cbdd69a04 \
                     sha256  5d8f5039efe01d92f19843cea3d281ec900ca4558433b4291a682b5b8a2fd511
 
-# requires 10.11 or newer at present
+# /usr/bin/clang on 10.9 does not support gnu++14 
+platform darwin 13 {
+    compiler.whitelist macports-clang-5.0
+}
+
+
+# requires 10.10 or newer at present
 # see https://trac.macports.org/ticket/55591
+# note - some deleted code in platform-macosm-fixups needs to be reviewed
 platform darwin {
 
-    if {${os.major} < 11 } {
+    if {${os.major} < 14 } {
 		pre-fetch {
-	#        ui_error "${name} requires OS X 10.7 or later"
-	#        return -code error "incompatible OS version"
+	        ui_error "${name} requires OS X 10.10 or later"
+	        return -code error "incompatible OS version"
 		}
     }
     
@@ -36,7 +43,7 @@ platform darwin {
         patchfiles-append patch-src-openrct2-common-strnlen.diff
     }
     
-    if {${os.major} < 14 } {    
+    if {${os.major} < 13 } {    
         patchfiles-append patch-scr-openrct2-platfrom-posix-const-delete.diff
         patchfiles-append patch-src-openrct2-core-filescanner-const.diff
     }
