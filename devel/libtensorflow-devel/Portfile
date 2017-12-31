@@ -16,7 +16,7 @@ checksums               rmd160  086549761f24f07e79cae8c221299aac91ef1b54 \
 version                 20171230
 
 name                    libtensorflow-devel
-license                 GPL-2+
+license                 Apache-2
 categories              devel
 platforms               darwin
 maintainers             nomaintainer
