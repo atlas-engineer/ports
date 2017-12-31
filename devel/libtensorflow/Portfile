@@ -1,0 +1,68 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem              1.0
+PortGroup               github 1.0
+
+#github.setup            tensorflow tensorflow 1.2.0 v
+#checksums               rmd160  9fa027bf7f0abd9e1b75ceefb7cba4fb6ece1bda \
+#                        sha256  6d70300720374196a8189dd45d9a044dc5a5de2da4a321a2dc43d0e1da9c6f72
+# release 1.2.0 does not build with newer versions of bazel
+
+
+github.setup            tensorflow tensorflow f8d12a4a3641adef9b5720120fec07d99a17c335
+checksums               rmd160  086549761f24f07e79cae8c221299aac91ef1b54 \
+                        sha256  b6c8cc206d387b73bd3812417f2b582d5fccf78b686c125e7044149da76cc024
+
+version                 20171230
+
+name                    libtensorflow-devel
+license                 GPL-2+
+categories              devel
+platforms               darwin
+maintainers             nomaintainer
+description             C interface for Google's OS library for Machine Intelligence
+long_description        ${description}
+
+homepage                https://www.tensorflow.org/
+
+depends_build-append    port:python36 \
+                        port:bazel
+
+configure.env-append    PYTHON_BIN_PATH=${prefix}/bin/python3.6 \
+                        USE_DEFAULT_PYTHON_LIB_PATH=1 \
+                        TF_NEED_JEMALLOC=1 \
+                        TF_NEED_GCP=0 \
+                        TF_NEED_HDFS=0 \
+                        TF_ENABLE_XLA=0 \
+                        TF_NEED_OPENCL=0 \
+                        TF_NEED_CUDA=0 \
+                        TF_NEED_MKL=0 \
+                        TF_NEED_VERBS=0
+
+build {
+    system -W ${worksrcpath} \
+        "bazel build --compilation_mode=opt tensorflow:libtensorflow.so"
+}
+
+destroot {
+    copy ${worksrcpath}/bazel-bin/tensorflow/libtensorflow.so ${destroot}${prefix}/lib/libtensorflow.dylib
+    copy ${worksrcpath}/bazel-bin/tensorflow/libtensorflow_framework.so ${destroot}${prefix}/lib/libtensorflow_framework.dylib
+    system "install_name_tool -id ${prefix}/lib/libtensorflow.dylib ${destroot}${prefix}/lib/libtensorflow.dylib"
+    system "install_name_tool -id ${prefix}/lib/libtensorflow_framework.dylib ${destroot}${prefix}/lib/libtensorflow_framework.dylib"
+    system "install_name_tool -change @rpath/libtensorflow_framework.so ${prefix}/lib/libtensorflow_framework.dylib ${destroot}${prefix}/lib/libtensorflow.dylib"
+
+    xinstall -d ${destroot}${prefix}/include/tensorflow/c/
+    copy ${worksrcpath}/tensorflow/c/c_api.h ${destroot}${prefix}/include/tensorflow/c/c_api.h
+
+    set data "\n\
+        Name: tensorflow\n\
+        Description: Tensorflow C library\n\
+        Version: ${version}\n\
+        Libs: -L${prefix}/lib -ltensorflow\n\
+        Cflags: -I${prefix}/include\n\
+        "
+    set filename "${destroot}${prefix}/lib/pkgconfig/libtensorflow.pc"
+    set fileId [open $filename "w"]
+    puts -nonewline $fileId $data
+    close $fileId
+}
