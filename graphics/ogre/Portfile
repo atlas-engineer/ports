@@ -1,0 +1,45 @@
+# -*- mode: tcl; indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4 -*-
+
+PortSystem          1.0
+PortGroup cmake     1.1
+PortGroup github    1.0
+
+github.setup        OGRECave ogre 1.10.11 v
+
+checksums           rmd160  65596930faa4e0be118c65664af0f67eebfdd8a9 \
+                    sha256  4d75eece04c9b9bb57e937cfc18af0b95aa0b492ceb7d54bcc1967222f083cac
+
+license             MIT
+categories          graphics
+maintainers         nomaintainer
+description         Object-Oriented Graphics Rendering Engine
+
+long_description    OGRE (Object-Oriented Graphics Rendering Engine) is a \
+                    scene-oriented, flexible 3D engine written in \
+                    C++ designed to make it easier and more intuitive \
+                    for developers to produce applications utilising \
+                    hardware-accelerated 3D graphics. The class \
+                    library abstracts all the details of using the \
+                    underlying system libraries like Direct3D and \
+                    OpenGL and provides an interface based on world \
+                    objects and other intuitive classes.
+                    
+
+homepage            http://www.ogre3d.org/
+platforms           darwin
+supported_archs     x86_64
+
+
+depends_build-append port:doxygen path:bin/dot:graphviz
+
+depends_lib-append  port:libzzip port:zlib port:bzip2 port:freeimage \
+                    port:freetype port:boost port:ois
+
+
+configure.args-append  \
+                    -DOGRE_BUILD_TOOLS=TRUE \
+                    -DOGRE_BUILD_SAMPLES=TRUE \
+                    -DOGRE_INSTALL_DOCS=TRUE \
+                    -DOGRE_INSTALL_SAMPLES=TRUE \
+                    -DOGRE_INSTALL_SAMPLES_SOURCE=TRUE \
+                    -DOGRE_INSTALL_TOOLS=TRUE
