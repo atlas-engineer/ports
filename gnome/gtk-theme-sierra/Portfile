@@ -1,0 +1,35 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           github 1.0
+
+github.setup        vinceliuice Sierra-gtk-theme 72b528c3a9b8fd66d42ccf187b2df31b42aacafc
+
+name                gtk-theme-sierra
+version             20180227
+
+categories          gnome
+maintainers         {@kencu kencu} openmaintainer
+license             GPL-3+
+platforms           darwin
+description         Sierra theme for gtk2 and gtk3
+
+long_description    ${description}
+
+checksums           rmd160  c93c3bda4c3194a0039336b3d954445d7fa38b7b \
+                    sha256  0f39794ab337594fcb2fab5e53983ca5522c988961042fdceac05c1830ec6939
+
+# for gtk2, this port requires gtk2-murrine
+depends_lib-append  port:gtk2-murrine
+
+patchfiles          patch-install-destdir.diff
+post-patch {
+    reinplace "s|@@PREFIX@@|\$DESTDIR${prefix}|g" Install
+    reinplace "s|cp -ur|cp -r|g" Install
+}
+
+use_configure       no
+build               {}
+destroot {
+    system -W ${worksrcpath} "DESTDIR=${destroot} ./Install"
+}
