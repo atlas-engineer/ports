@@ -12,6 +12,8 @@ categories          gnome
 maintainers         {@kencu kencu} openmaintainer
 license             GPL-3+
 platforms           darwin
+supported_archs     noarch
+
 description         Sierra theme for gtk2 and gtk3
 
 long_description    ${description}
@@ -19,8 +21,9 @@ long_description    ${description}
 checksums           rmd160  c93c3bda4c3194a0039336b3d954445d7fa38b7b \
                     sha256  0f39794ab337594fcb2fab5e53983ca5522c988961042fdceac05c1830ec6939
 
-# for gtk2, this port requires gtk2-murrine
-depends_lib-append  port:gtk2-murrine
+depends_run-append  port:gtk2-murrine \
+                    port:gtk2 \
+                    port:gtk3
 
 patchfiles          patch-install-destdir.diff
 post-patch {
