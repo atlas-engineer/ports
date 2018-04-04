@@ -126,7 +126,7 @@ depends_lib-append          port:curl
 depends_lib-append          port:qrupdate
 depends_lib-append          port:arpack
 depends_lib-append          port:openssl
-depends_lib-append          port:sundials
+depends_lib-append          port:sundials2
 
 
 
