@@ -8,6 +8,7 @@ subport             openscad-devel {}
 
 if {${subport} eq "openscad"} {
 
+    conflicts           openscad-devel
     version             2015.03-3
     revision            5
     master_sites        http://files.openscad.org
@@ -33,16 +34,20 @@ if {${subport} eq "openscad"} {
 
 } elseif {${subport} eq "openscad-devel"} {
 
+    conflicts           openscad
     PortGroup           github 1.0
     github.setup        openscad openscad e7c0851d4023817b2a11df2583d6f406f3b58883
     version             2018.04-1
     
-    checksums               rmd160  57ce759879770675cb7853a6735ad66a5956ddd1 \
-                            sha256  40447cbb91a853a16dc1872063cd5c90150356ff31c4d8b5e6296a7a4ec26f23
+    checksums           rmd160  57ce759879770675cb7853a6735ad66a5956ddd1 \
+                        sha256  40447cbb91a853a16dc1872063cd5c90150356ff31c4d8b5e6296a7a4ec26f23
 
-	post-extract {
-		system -W ${worksrcpath}/libraries "${prefix}/bin/git clone https://github.com/openscad/MCAD.git"
-	}
+    # this should be done differently for an official Portfile - the added distfiles 
+    # method, see minetest for an example. PITA though, and this works fine.
+    
+    post-extract {
+        system -W ${worksrcpath}/libraries "${prefix}/bin/git clone https://github.com/openscad/MCAD.git"
+    }
 
     # patchfiles - unchanged from 2015.03-1
     patchfiles-append    patch-src-colormap.h.diff
@@ -164,9 +169,16 @@ pre-test {
     set worksrcdir  ${worksrcdir}/tests
 }
 test {
-    system -W ${worksrcpath} "cmake . -DCOMPARATOR=ncc"
-    system -W ${worksrcpath} "make -j"
-    system -W ${worksrcpath} "${prefix}/bin/ctest -C All"
+#    system -W ${worksrcpath} "cmake . -DCOMPARATOR=ncc"
+#    system -W ${worksrcpath} "make -j"
+#    system -W ${worksrcpath} "${prefix}/bin/ctest -C All"
+
+    # had to run these tests manually to make them work. May be fixable.
+    system -W ${worksrcpath} "cmake . -DCOMPARATOR=AE"
+    system -W ${worksrcpath} "make"
+    system -W ${worksrcpath} "${prefix}/bin/ctest --verbose"
+
+
 }
 
 livecheck.type      regex
