@@ -12,7 +12,13 @@ if {${subport} eq "enigma"} {
     checksums               rmd160  7942dd2acc1e21cb40200a9ae767a4673c569a2a \
                             sha256  d872cf067d8eb560d3bb1cb17245814bc56ac3953ae1f12e2229c8eb6f82ce01
 
-    use_autoconf            yes
+#    configure.env-append    AUTOCONF=${prefix}/bin/autoconf \
+#                            AUTOHEADER=${prefix}/bin/autoheader \
+#                            AUTOMAKE=${prefix}/bin/automake \
+#                            ACLOCAL=${prefix}/bin/aclocal
+                            
+     use_autoconf            yes
+#     autoconf.cmd            ./autogen.sh
 
 } elseif {${subport} eq "enigma-devel"} {
     conflicts               enigma
@@ -47,9 +53,9 @@ use_parallel_build      no
 # this is needed for the configure script logic on MacOS
 configure.args-append   --with-libintl-prefix=${prefix}
 
-# lua 5.1 works, others don't, so prepend the patch to lua-5.1
+# uses a bundled lua-5.1 version, so find those headers instead of any in the system path
 configure.cppflags-prepend \
-                        -I${prefix}/include/lua-5.1
+                        -I${worksrcpath}/lib-src/lua
 
 # remove SDL frameworks - these are not used in MacPorts as we use dylibs
 patchfiles-append       patch-configure-ac-remove-frameworks.diff
@@ -62,7 +68,7 @@ patchfiles-append       patch-configure-ac-stop-static-linking.diff
 depends_build-append    port:pkgconfig \
                         port:ImageMagick \
                         port:texi2html \
-                        port:osxutils
+                        port:osxutils                      
 
 depends_lib             port:libsdl \
                         port:libsdl_image \
@@ -76,7 +82,6 @@ depends_lib             port:libsdl \
                         port:curl \
                         port:zlib \
                         port:bzip2 \
-                        port:lua51 \
                         port:libiconv \
                         port:icu
 
