@@ -5,7 +5,7 @@
    if test -d "${with_libintl_prefix}/lib" && test -f "${with_libintl_prefix}/lib/libintl.a" ; then
      LIBINTL="${with_libintl_prefix}/lib/libintl.a"
 -    LIBS="$LIBINTL /usr/lib/libiconv.dylib $LIBS"
-+    LIBS="$LIBINTL -licuuc -liconv $LIBS"
++    LIBS="-lintl -licuuc -liconv $LIBS"
    else
      AC_MSG_ERROR([The specified --with-libintl-prefix did not contain lib/libintl.a which is required on MacOS for static link])
    fi
