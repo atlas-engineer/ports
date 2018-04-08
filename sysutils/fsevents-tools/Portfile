@@ -21,15 +21,15 @@ checksums           rmd160  c1b9078dc34dd5294d676fd9ad9bf25872e0ed63 \
                     size    86355
 
 # 10.7 SDK is not compatible with PowerPC
-# build suceeds on 10.5 Intel, but only with a clang compiler
-
 supported_archs     i386 x86_64
+
+# build succeeds on 10.5 and 10.6 Intel, but only with a clang compiler
 compiler.blacklist-append *gcc*
 
+# uses kFSEventStreamCreateFlagFileEvents which is in SDK 10.7+
 platform macosx {
-    # uses kFSEventStreamCreateFlagFileEvents which is in SDK 10.7+
     if {${os.major} <= 10} {
-        # Build requires at least 10.7.3 SDK, even when targeting 10.6
+        # Build requires at least 10.7.3 SDK
         set lion_sdkpath ${developer_dir}/SDKs/MacOSX10.7.sdk
         if {[file exists $lion_sdkpath]} {
             configure.sdkroot $lion_sdkpath
@@ -40,7 +40,6 @@ platform macosx {
         }
     }
 }
-
 
 livecheck.type      regex
 livecheck.url       ${homepage}
