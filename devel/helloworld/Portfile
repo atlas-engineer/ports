@@ -23,7 +23,7 @@ configure.cxx_stdlib    libc++
 depends_lib             port:libcxx
 
 platform darwin powerpc {
-    compiler.whitelist           macports-clang-3.4
+    compiler.whitelist           macports-clang-3.6
     configure.cxxflags-append    -fPIC -std=c++11
     configure.ldflags-prepend    -nodefaultlibs -lc++ -lc++abi -lSystem
 }

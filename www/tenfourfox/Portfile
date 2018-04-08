@@ -75,18 +75,13 @@ platform darwin i386 {
 
 
 
-
-
-
-
 build.env           CXX="${configure.cxx}" \
 				    CXXFLAGS="${configure.cxxflags} [get_canonical_archflags cxx]" \
 				    CC="${configure.cc}" \
 				    CFLAGS="${configure.cflags} [get_canonical_archflags cc]" \
 				    LDFLAGS="${configure.ldflags} [get_canonical_archflags ld]" \
 				    PREFIX=${prefix} \
-				    SHELL=/bin/bash \
-				    MACOSX_DEPLOYMENT_TARGET=10.4
+				    SHELL=/bin/bash
 
 build.cmd           gmake -f client.mk build
 
