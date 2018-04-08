@@ -41,6 +41,10 @@ platform macosx {
     }
 }
 
+# To Do: testing requires a new python port cram which does not yet exist
+# https://bitheap.org/cram/
+#test.run            yes
+
 livecheck.type      regex
 livecheck.url       ${homepage}
 livecheck.regex     ${name}-(\\d+(?:\\.\\d+)*)
