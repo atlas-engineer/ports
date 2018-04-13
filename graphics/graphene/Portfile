@@ -1,0 +1,73 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           github 1.0
+PortGroup           compiler_blacklist_versions 1.0
+PortGroup           meson 1.0
+PortGroup           muniversal 1.0
+
+github.setup        ebassi graphene 1.8.0
+license             Permissive
+categories          graphics gnome
+maintainers         {devans @dbevans} openmaintainer
+platforms           darwin
+homepage            https://ebassi.github.io/${name}/
+
+description         A thin layer of graphic data types
+
+long_description    ${description}
+
+checksums           rmd160  2d0ba5a4d85c46f9fa454c55e564a036f5e9e823 \
+                    sha256  ef1eb4c7bbc14323b9fe6cb20efeffa6414228af81d26c90d8ed7c39fab5b48c \
+                    size    157278
+
+depends_build-append \
+                    port:pkgconfig
+
+depends_lib         path:lib/pkgconfig/glib-2.0.pc:glib2 \
+                    port:gobject-introspection
+
+compiler.blacklist-append {clang >= 703.0.29 < 800}
+
+# 10.5 or less has no special memalign but doesn't need it
+# as malloc returns aligned memory. Passes all tests.
+if {${os.platform} eq "darwin" && ${os.major} < 10 } {
+    patchfiles-append patch-graphene-leopeard.diff
+    patchfiles-append patch-src-bench-matrix.diff
+}
+
+# attempt to fix build on 10.6 using gcc-4.2
+# error: ‘for’ loop initial declaration used outside C99 mode
+configure.cflags-append \
+                    -std=c99
+
+configure.args-append \
+                    -Dtests=false \
+                    -Dbenchmarks=false
+
+
+variant tests description "Enable Tests" {
+    test.run            yes
+    configure.args-replace -Dtests=false -Dtests=true
+    configure.args-replace -Dbenchmarks=false -Dbenchmarks=true
+    test.env-append     DYLD_FALLBACK_LIBRARY_PATH=${workpath}/build/src
+}
+
+
+
+# override @rpath in installed library's install name
+post-destroot {
+    set libname ${prefix}/lib/lib${name}-1.0.0.dylib
+    system "install_name_tool -id ${libname} ${destroot}${libname}"
+}
+
+# gobject-introspection uses g-ir-scanner, which uses $CC from env
+if {[variant_isset universal]} {
+    foreach arch ${configure.universal_archs} {
+        lappend merger_build_env(${arch})  CC='${configure.cc} -arch ${arch}'
+        lappend merger_destroot_env(${arch})  CC='${configure.cc} -arch ${arch}'
+    }
+} else {
+    build.env-append       CC="${configure.cc} ${configure.cc_archflags}"
+    destroot.env-append    CC="${configure.cc} ${configure.cc_archflags}"
+}

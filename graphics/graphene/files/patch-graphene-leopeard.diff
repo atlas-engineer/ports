@@ -1,0 +1,21 @@
+--- meson.build.old	2018-04-12 17:57:23.000000000 -0700
++++ meson.build	2018-04-12 17:58:09.000000000 -0700
+@@ -147,12 +147,12 @@
+ # Don't probe the ones below on Windows because when building with
+ # MinGW-w64 on MSYS2, Meson<0.37.0 incorrectly detects those below as
+ # being available even though they're not.
+-elif cc.has_function('aligned_alloc', prefix: '#include <stdlib.h>') and not (host_system == 'windows')
+-  conf.set10('HAVE_ALIGNED_ALLOC', 1, description: 'Define if aligned_malloc() is available')
+-elif cc.has_function('posix_memalign', prefix: '#include <stdlib.h>') and not (host_system == 'windows')
+-  conf.set10('HAVE_POSIX_MEMALIGN', 1, description: 'Define if posix_memalign() is available')
+-else
+-  error('No aligned malloc function could be found.')
++#elif cc.has_function('aligned_alloc', prefix: '#include <stdlib.h>') and not (host_system == 'windows')
++#  conf.set10('HAVE_ALIGNED_ALLOC', 1, description: 'Define if aligned_malloc() is available')
++#elif cc.has_function('posix_memalign', prefix: '#include <stdlib.h>') and not (host_system == 'windows')
++#  conf.set10('HAVE_POSIX_MEMALIGN', 1, description: 'Define if posix_memalign() is available')
++#else
++#  error('No aligned malloc function could be found.')
+ endif
+ 
+ # Look for sincosf(), a GNU libc extension
