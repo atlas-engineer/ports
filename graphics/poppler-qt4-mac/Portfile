@@ -64,34 +64,9 @@ configure.args-append \
                     -DWITH_NSS3=OFF \
                     -DENABLE_GLIB=OFF
 
+# needs tweak to apply
 # patchfiles          patch-CVE-2017-18267.diff
 
-
-#if {${subport} ne ${name}} {
-#    depends_extract-append  port:git
-#
-#    depends_lib-append      port:poppler61
-#
-#    post-extract {
-#        system -W ${workpath} "${prefix}/bin/git clone --depth=1 http://anongit.freedesktop.org/git/poppler/test"
-#    }
-
-# currently poppler only provides unit tests for the Qt wrappers
-
-#    test.run    yes
-#    test.target check
-
-#    post-destroot {
-#        foreach dot_h [glob -nocomplain -directory ${destroot}${prefix}/include/poppler *.h] {
-#            delete $dot_h
-#        }
-#        foreach libpoppler [glob -nocomplain ${destroot}${prefix}/lib/libpoppler.*] {
-#            delete ${libpoppler}
-#        }
-#        delete  ${destroot}${prefix}/include/poppler/fofi \
-#                ${destroot}${prefix}/include/poppler/goo \
-#                ${destroot}${prefix}/include/poppler/splash \
-#                ${destroot}${prefix}/lib/pkgconfig/poppler-splash.pc \
-#                ${destroot}${prefix}/lib/pkgconfig/poppler.pc
-#    }
-#}
+# gobject-introspection fails due to not finding it's libraries during build
+# probably some easy fix for this, but for now, just disable it
+# py-qt4 and frescobaldi built fine with it turned off
