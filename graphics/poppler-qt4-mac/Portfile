@@ -3,7 +3,7 @@
 PortSystem          1.0
 PortGroup           compiler_blacklist_versions 1.0
 PortGroup           cxx11 1.1
-#PortGroup           gobject_introspection 1.0
+PortGroup           gobject_introspection 1.0
 PortGroup           cmake 1.1
 PortGroup           qt4 1.0
 
@@ -47,7 +47,8 @@ depends_lib         port:bzip2 \
 
 configure.ldflags-append -liconv
 configure.cxxflags-append -std=c++11
-#gobject_introspection yes
+
+gobject_introspection yes
 configure.env-append    MOCQT4=${qt_bins_dir}/moc
 
 cmake.install_prefix ${prefix}/libexec/${name}
@@ -61,12 +62,9 @@ configure.args-append \
                     -DBUILD_GTK_TESTS=OFF \
                     -DBUILD_QT5_TESTS=OFF \
                     -DBUILD_CPP_TESTS=OFF \
-                    -DWITH_NSS3=OFF \
-                    -DENABLE_GLIB=OFF
+                    -DWITH_NSS3=OFF
 
-# needs tweak to apply
-# patchfiles          patch-CVE-2017-18267.diff
+patchfiles          patch-CVE-2017-18267.diff
 
-# gobject-introspection fails due to not finding it's libraries during build
-# probably some easy fix for this, but for now, just disable it
-# py-qt4 and frescobaldi built fine with it turned off
+# https://bugs.freedesktop.org/show_bug.cgi?id=106417
+patchfiles-append   patch-bug106417.diff
