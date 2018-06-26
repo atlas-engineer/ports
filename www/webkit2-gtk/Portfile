@@ -86,6 +86,15 @@ patchfiles-append \
 # stripped out. Replace it with the previous version
 patchfiles-append \
     patch-ramsize.diff
+ 
+# Source/WTF/wtf/unix/CPUTimeUnix.cpp has changed, and the Darwin parts
+# were stripped out. Add back the previous Darwin version
+patchfiles-append \
+    patch-source-wtf-wtf-unix-cputimeunix-cpp-darwin-version-restore.diff
+    
+# some Darwin versions don't have MAP_JIT
+patchfiles-append \
+    patch-source-wtf-wtf-osallocatorposix-cpp-map-jit.diff
 
 
 
