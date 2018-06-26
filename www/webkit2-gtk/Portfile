@@ -12,8 +12,8 @@ PortGroup           cxx11 1.1
 
 name                webkit2-gtk
 conflicts           webkit2-gtk-devel
-version             2.18.0
-description         Apple's WebKit2 HTML rendering library for GTK+3
+version             2.21.4
+description         Apple's WebKit2 HTML rendering library for GTK+3 (with optional support for GTK+2 plugins)
 long_description    ${description}
 maintainers         {jeremyhu @jeremyhu} {devans @dbevans}
 categories          www gnome
@@ -27,8 +27,9 @@ distname            webkitgtk-${version}
 
 dist_subdir         webkit-gtk
 
-checksums           rmd160  786ffab37419fb68f83b20059fca98fd9fdf6cc1 \
-                    sha256  b583e46a3de36a3e80ba33b084ead60512a2046aca01ff61e50e519436e5038d
+checksums           rmd160  3fb83eb97d9516d2a69140e1c3bd0d8e50e42b4a \
+                    sha256  59f4359ace702ecaa92b975666c1bcde3858258909b047e7675ce3807efdd1e7 \
+                    size    16873972
 
 # don't overwrite build dependencies provided by cmake portgroup
 depends_build-append \
@@ -65,21 +66,21 @@ depends_lib         port:atk \
                     port:libxslt \
                     port:sqlite3 \
                     port:webp \
+                    port:woff2 \
                     port:zlib
 
 # PR-152650-2.patch: WIP to re-enable gtk-doc support
 # PR-153138.patch: https://bugs.webkit.org/show_bug.cgi?id=153138
-# PR-157554.patch: https://bugs.webkit.org/show_bug.cgi?id=157554
 # PR-157574.patch: https://bugs.webkit.org/show_bug.cgi?id=157574
-# PR-176870.patch: https://bugs.webkit.org/show_bug.cgi?id=176870 (already landed in trunk)
+# patch-name-conflicts.diff: avoid conflicts between Style in /usr/include/MacTypes.h
+#                            and WebCore::Style
 patchfiles-append \
     PR-152650-2.patch \
     PR-153138.patch \
     PR-157574.patch \
-    PR-176870.patch \
-    patch-disable-mach-exceptions.diff \
     patch-bundle-link-webcore.diff \
-    patch-fix-include-path.diff
+    patch-enable-plugin-architecture-unix.diff \
+    patch-name-conflicts.diff
     
 # Source/WTF/wtf/RAMSize.cpp has changed, and the Darwin parts were
 # stripped out. Replace it with the previous version
@@ -120,20 +121,12 @@ pre-configure {
 }
 
 post-configure {
-    # Source/WebKit2 is renamed to Source/WebKit
-    # https://github.com/WebKit/webkit/commit/7f8a4a6dab6e75a624a97e5ce47de5626476b67d
-
     # https://bugs.webkit.org/show_bug.cgi?id=153176
     reinplace {s|\.\./\.\./lib/libWTFGTK\.a||} \
-        ${build.dir}/Source/WebKit/CMakeFiles/WebKit2.dir/link.txt
-    reinplace {s|\.\./\.\./lib/libbmalloc\.a||} \
-        ${build.dir}/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/link.txt
-    # DatabaseProcess is renamed to StorageProcess
-    # https://bugs.webkit.org/show_bug.cgi?id=174879
+        ${build.dir}/Source/WebKit/CMakeFiles/WebKit.dir/link.txt
     reinplace {s|[\./]*\.\./lib/lib[^\.]*\.a||g} \
         ${build.dir}/Source/JavaScriptCore/CMakeFiles/LLIntOffsetsExtractor.dir/link.txt \
         ${build.dir}/Source/JavaScriptCore/shell/CMakeFiles/jsc.dir/link.txt \
-        ${build.dir}/Source/JavaScriptCore/shell/CMakeFiles/testb3.dir/link.txt \
         ${build.dir}/Source/WebKit/CMakeFiles/StorageProcess.dir/link.txt \
         ${build.dir}/Source/WebKit/CMakeFiles/NetworkProcess.dir/link.txt \
         ${build.dir}/Source/WebKit/CMakeFiles/webkit2gtkinjectedbundle.dir/link.txt \
@@ -168,6 +161,13 @@ if {![variant_isset quartz]} {
     default_variants-append +x11 +gtk2
 }
 
+# fix build with +quartz variant
+# see https://trac.macports.org/ticket/56724
+# TO DO: is there a more elegant fix ?
+if {[variant_isset quartz]} {
+    configure.args-append -DUSE_GSTREAMER_GL=OFF
+}
+
 # fix build on older systems
 if {${os.platform} eq "darwin" && ${os.major} <= 13} {
 
@@ -187,30 +187,31 @@ if {${os.platform} eq "darwin" && ${os.major} <= 13} {
     # the unix version does not, and seems to build OK so use that
     # the ifdefs were too cumbersome to sort out, so for now I just stripped those out and left
     # the unix build behind - FIXME: sort the ifdefs out
+    # https://bugs.webkit.org/show_bug.cgi?id=157554
     patchfiles-append   patch-WTF-wtf-Randomdevice.diff
 
     # add dep for newer ruby and spec this for build
     # https://trac.macports.org/ticket/52016
     depends_build-append    port:ruby24
     configure.args-append   -DRUBY_EXECUTABLE=${prefix}/bin/ruby2.4
+    
+    if { ${os.major} < 11 } {
+        # disabling JIT fixes the following build error on 10.6.8
+        # offlineasm: No magic values found. Skipping assembly file generation.
+        configure.args-append -DENABLE_JIT=OFF
+    }
 
     # fix missing PRId64 definitions on systems
     # that don't define __STDC_FORMAT_MACROS by default
     # https://bugs.webkit.org/show_bug.cgi?id=156596
     # https://trac.macports.org/ticket/52016
     patchfiles-append patch-snowleopard-cmakelists-stdcformatmacros.diff
-
-    # fix a Cursor name collision with Carbon API
-    # https://trac.macports.org/ticket/52016
-    if {[variant_isset x11]} {
-        patchfiles-append patch-snowleopard-npruntime-redefine-cursor.diff
-    }
     
     # special case: fix build on 10.6 with macports-libstdc++
     # contents of snowmath.h should someday become part of gcc6 cmath
     if { ${configure.cxx_stdlib} eq "macports-libstdc++"  && ${os.major} < 11 } {
         configure.cxxflags-append -D_GLIBCXX_USE_C99_MATH_TR1=1
-        configure.cxxflags-append -include ${portpath}/${filesdir}/snowmath.h
+        configure.cxxflags-append -include ${filespath}/snowmath.h
     }
 }
 
