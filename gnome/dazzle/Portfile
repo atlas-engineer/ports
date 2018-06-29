@@ -1,21 +1,22 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
-PortGroup           compiler_blacklist_versions 1.0
+# compiler requirements presently under review
+#PortGroup           compiler_blacklist_versions 1.0
 
 name                libdazzle
 version             3.29.3
-license             GPL-2+
+license             GPL-3+
 set branch          [join [lrange [split ${version} .] 0 1] .]
-description         A GNOME Web browser.
-long_description    A web browser is more than an application, it is a \
-                    way of thinking, it is a way of seeing the world. \
-                    Epiphany's principles are simplicity and standards \
-                    compliance.
-maintainers         {devans @dbevans} openmaintainer
+description         The libdazzle library is a companion library to GObject and Gtk+.
+long_description    ${description}.  It includes a collection of dazzling Gtk widgets, \
+                    data structures, search engines, a shortcut engine, panels, \
+                    desktop integration, and those missing pieces from common libraries \
+                    that help you write cleaner and safer code
+maintainers         {devans @dbevans} {kencu @kencu} openmaintainer
 categories          gnome www
 platforms           darwin
-homepage            https://wiki.gnome.org/Apps/Web
+homepage            https://gitlab.gnome.org/GNOME/libdazzle
 master_sites        gnome:sources/${name}/${branch}/
 
 use_xz              yes
@@ -27,13 +28,14 @@ checksums           rmd160  05d2f0fcc6612a103ba59c8c13285cdac94be792 \
 depends_build-append \
                     port:pkgconfig \
                     port:meson \
-                    port:ninja
+                    port:ninja \
+                    port:vala
 
 depends_lib-append  port:gtk3 \
                     port:gnome-desktop
 
-# error: invalid value 'gnu11' in '-std=gnu11'
-compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 212}
+# compiler requirements presently under review
+# compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 212}
 
 configure.cmd       meson
 configure.post_args . build
@@ -61,6 +63,5 @@ post-activate {
     system "${prefix}/bin/update-desktop-database -q ${prefix}/share/applications"
     system "${prefix}/bin/glib-compile-schemas ${prefix}/share/glib-2.0/schemas"
 }
-
 
 livecheck.type          gnome
