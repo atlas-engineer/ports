@@ -33,12 +33,12 @@ depends_build-append \
 depends_lib-append  port:gtk3 \
                     port:gnome-desktop
 
-compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 500}
+compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 500} macports-clang-3.4 
 platform darwin i386 {
     compiler.fallback-append macports-clang-5.0 macports-clang-4.0 macports-clang-3.9 macports-clang-3.8 macports-clang-3.7
 }
 platform darwin powerpc {
-    compiler.fallback-append macports-gcc-6 macports-gcc7 macports-gcc-5 macports-gcc-4.9 macports-gcc-4.8 macports-gcc-4.7
+    compiler.fallback-append macports-gcc-6 macports-gcc-7 macports-gcc-5 macports-gcc-4.9 macports-gcc-4.8 macports-gcc-4.7
 }
 
 configure.cmd       meson
