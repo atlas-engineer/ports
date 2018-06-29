@@ -1,10 +1,11 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
+
 # compiler requirements presently under review
 #PortGroup           compiler_blacklist_versions 1.0
 
-name                libdazzle
+name                dazzle
 version             3.29.3
 license             GPL-3+
 set branch          [join [lrange [split ${version} .] 0 1] .]
@@ -14,10 +15,10 @@ long_description    ${description}.  It includes a collection of dazzling Gtk wi
                     desktop integration, and those missing pieces from common libraries \
                     that help you write cleaner and safer code
 maintainers         {devans @dbevans} {kencu @kencu} openmaintainer
-categories          gnome www
+categories          gnome
 platforms           darwin
 homepage            https://gitlab.gnome.org/GNOME/libdazzle
-master_sites        gnome:sources/${name}/${branch}/
+master_sites        gnome:sources/libdazzle/${branch}/
 
 use_xz              yes
 
