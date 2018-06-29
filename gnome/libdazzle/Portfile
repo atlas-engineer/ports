@@ -1,9 +1,7 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
-
-# compiler requirements presently under review
-#PortGroup           compiler_blacklist_versions 1.0
+PortGroup           compiler_blacklist_versions 1.0
 
 name                libdazzle
 version             3.29.3
@@ -35,8 +33,7 @@ depends_build-append \
 depends_lib-append  port:gtk3 \
                     port:gnome-desktop
 
-# compiler requirements presently under review
-# compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 212}
+compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 212}
 
 configure.cmd       meson
 configure.post_args . build
