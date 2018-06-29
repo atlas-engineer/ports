@@ -9,7 +9,7 @@ name                libdazzle
 version             3.29.3
 license             GPL-3+
 set branch          [join [lrange [split ${version} .] 0 1] .]
-description         The libdazzle library is a companion library to GObject and Gtk+.
+description         libdazzle is a companion library to GObject and Gtk+.
 long_description    ${description}.  It includes a collection of dazzling Gtk widgets, \
                     data structures, search engines, a shortcut engine, panels, \
                     desktop integration, and those missing pieces from common libraries \
