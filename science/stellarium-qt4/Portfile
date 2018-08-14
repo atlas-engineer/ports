@@ -15,9 +15,11 @@ platforms           darwin
 license             GPL-2+
 maintainers         {kencu @kencu} openmaintainer
 
-description         Stellarium is a free open source planetarium for your computer.
-long_description    ${description} This version is the last version based on qt4, which may \
-                    run, or run more efficiently, on older systems.
+description         Stellarium is a free open source planetarium for your computer. \
+                    This older version is the last version based on qt4 which may \
+                    run, or run more efficiently, on older or less powerful systems.
+long_description    ${description} It has been updated with some fixes and features \
+                    found in later versions of Stellarium.
 
 homepage            http://stellarium.org/
 
