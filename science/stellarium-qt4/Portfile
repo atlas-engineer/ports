@@ -36,6 +36,9 @@ depends_lib-append  port:freetype \
 post-patch {
     reinplace "s:SET(CMAKE_INSTALL_PREFIX \"\$\{PROJECT_BINARY_DIR\}/:SET(CMAKE_INSTALL_PREFIX \"${applications_dir}/:" ${worksrcpath}/CMakeLists.txt
 
+    # be more liberal with the allowed system versions
+    reinplace "s:10.6.0:10.4.11:" ${worksrcpath}/data/Info.plist
+
     # Determine which archs to build
     if {[variant_isset universal]} {
         set archs ${configure.universal_archs}
