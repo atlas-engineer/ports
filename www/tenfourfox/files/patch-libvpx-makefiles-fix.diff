@@ -1,0 +1,51 @@
+From 7b7fa1e15c574c257508f0b00f678e97d7635a9d Mon Sep 17 00:00:00 2001
+From: Ken Cunningham <kencu@macports.org>
+Date: Thu, 3 May 2018 13:24:42 -0700
+Subject: [PATCH] libvpx: tune Makefile.in and moz.build for Intel
+
+---
+ media/libvpx/Makefile.in | 6 ++++++
+ media/libvpx/moz.build   | 6 +++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/media/libvpx/Makefile.in b/media/libvpx/Makefile.in
+index 3b9102857..d48410779 100644
+--- a/media/libvpx/Makefile.in
++++ b/media/libvpx/Makefile.in
+@@ -9,6 +9,12 @@ VPX_AS=gcc
+ VPX_ASM_SUFFIX=s
+ endif
+ 
++ifdef VPX_X86_ASM
++CC=/opt/local/bin/clang-mp-3.4 -arch i386 -O3
++VPX_AS=yasm
++VPX_ASM_SUFFIX=asm
++endif
++
+ # Set up the libvpx assembler config.
+ 
+ AS=$(VPX_AS)
+diff --git a/media/libvpx/moz.build b/media/libvpx/moz.build
+index 5bcbca565..843b4575d 100644
+--- a/media/libvpx/moz.build
++++ b/media/libvpx/moz.build
+@@ -102,6 +102,7 @@ if CONFIG['CLANG_CL'] or not CONFIG['_MSC_VER']:
+ if CONFIG['GNU_CC']:
+     CFLAGS += ['-Wno-sign-compare']
+ 
++
+ ASFLAGS += CONFIG['VPX_ASFLAGS']
+ ASFLAGS += [
+     '-I.',
+@@ -109,7 +110,10 @@ ASFLAGS += [
+     '-I%s/media/libvpx/vpx_ports/' % TOPSRCDIR,
+ ]
+ # moved from Makefile.in for TenFourFox
+-ASFLAGS += ['-force_cpusubtype_ALL']
++
++# this only works on gcc-as (ie PPC)
++if not '86' in CONFIG['OS_TEST']:
++    ASFLAGS += ['-force_cpusubtype_ALL']
+ 
+ if CONFIG['OS_TARGET'] == 'Android':
+     # For LIBVPX_RAND

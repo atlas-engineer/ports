@@ -3,87 +3,66 @@
 PortSystem          1.0
 PortGroup           github 1.0
 
-github.setup        classilla tenfourfox FPR4
-distname            FPR4
-worksrcdir          FPR4
+github.setup        classilla tenfourfox 812d03b96a19e70e3cba19e83790a1a929e289bb
+version             20180819
 categories          www
 platforms           darwin
 maintainers         {kencu @kencu} openmaintainer
 license             GPL-2
 
-description         TenFourFox
+description         clone of Firefox, compatible with macOS 10.4+
 long_description    ${description}
 
-checksums           rmd160  e502aeb0ce51f762170ceea7b921e00ccf5f1a8f \
-                    sha256  7a55fe3a0b0edf656100a4fb8e1b01a7c1a054b5346100d549abb77979a8d795
+checksums           rmd160  87499c0e7e19fc8a94de4cdd33fd09d8be73c69d \
+                    sha256  02cb2d72ef2ade9d91a6734fdd521d45c25117845ed0fd32071d6e7160912b14 \
+                    size    257870280
 
 # <https://github.com/classilla/tenfourfox/wiki/HowToBuildFPR>
 depends_build       port:libidl \
+                    port:gcc48 \
                     port:autoconf213 \
                     port:gmake \
                     port:python27 \
                     port:freetype \
-                    port:yasm
+                    port:yasm \
+                    port:clang-3.4
 
-compiler.whitelist  macports-gcc-4.8                    
+# this is hardcoded into the mozconfig build script, but here anyway as a reminder
+compiler.whitelist  macports-gcc-4.8
+
+configure.cxx_stdlib libstdc++
+
+#select the proper config file. The nodebug config script is generally best for common use
+post-extract {
+    copy ${filespath}/ken-intel-nodebug.mozconfig ${worksrcpath}/.mozconfig
+}
+
+# TFF-Intel specific patches -- only 3!
+patch.pre_args      -p1
+patchfiles-append   patch-ots-stdlog-fix.diff
+patchfiles-append   patch-ycbcr-assembly-fix.diff
+patchfiles-append   patch-libvpx-makefiles-fix.diff
 
 use_autoconf        yes
 autoconf.cmd        autoconf213
 
 use_configure       no
 
-#select the proper config file
-post-extract {
-    file copy ${worksrcpath}/G5-nostrip.mozcfg ${worksrcpath}/.mozconfig
-}
+# not sure if this is needed or does anything, but we don't want to confuse the build with
+# any macports-passed-in values at present
+configure.cc
+configure.cxx
+configure.env
 
-
-##########  fixes to try building TenFourFox on 10.6.8 ###########
-platform darwin i386 {
-
-	# g++-mp-4.8: error: unrecognized argument in option '-mabi=no-altivec'
-	# g++-mp-4.8: error: unrecognized command line option '-mno-altivec'
-	pre-build {
-		reinplace "s|-mno-altivec||g" config/config.mk
-		reinplace "s|-mabi=no-altivec||g" config/config.mk
-	}
-	
-	# make sure this flags gets onto the build line
-	configure.cxxflags-append -fpermissive
-	
-
-    # need ac_add_options --with-macos-sdk={developer_dir}/SDKs/MacOSX10.4u.sdk
-    # tried to set this by adding -isysroot but
-
-	configure.cxxflags-append -isysroot ${developer_dir}/SDKs/MacOSX10.4u.sdk
-	configure.cflags-append -isysroot ${developer_dir}/SDKs/MacOSX10.4u.sdk
-	configure.cppflags-append -isysroot ${developer_dir}/SDKs/MacOSX10.4u.sdk
-
-    # configure:3576: /opt/local/bin/gcc-mp-4.8 -o conftest -Os -isysroot /Xcode3/SDKs/MacOSX10.4u.sdk -m64  -L/opt/local/lib -Wl,-headerpad_max_install_names  conftest.c  1>&5
-    #ld: library not found for -lcrt1.10.6.o
-    
-    # try /Xcode3/SDKs/MacOSX10.4u.sdk/usr/lib && ln -s crt1.o crt1.10.6.o
-    # that works...
-    
-	configure.cxxflags-append -mmacosx-version-min=10.4
-	configure.cflags-append -mmacosx-version-min=10.4
-	configure.cppflags-append -mmacosx-version-min=10.4
-
-
-}
-##########  end fixes to try building TenFourFox on 10.6.8 ###########
-
-
-
-build.env           CXX="${configure.cxx}" \
-				    CXXFLAGS="${configure.cxxflags} [get_canonical_archflags cxx]" \
-				    CC="${configure.cc}" \
-				    CFLAGS="${configure.cflags} [get_canonical_archflags cc]" \
-				    LDFLAGS="${configure.ldflags} [get_canonical_archflags ld]" \
-				    PREFIX=${prefix} \
-				    SHELL=/bin/bash
-
+# this is needed
+build.env           SHELL=/bin/bash
 build.cmd           gmake -f client.mk build
 
-destroot.env        PREFIX=${prefix}
+# make it self-contained. This could be over-ridden if we want
+pre-destroot {
+    system -W ${worksrcpath} "./104fx_copy.sh TenFourFox.app"
+}
 
+destroot {
+    move ${worksrcpath}/TenFourFox.app ${destroot}${applications_dir}
+}
