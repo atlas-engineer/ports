@@ -4,8 +4,8 @@ PortSystem          1.0
 PortGroup github    1.0
 PortGroup cxx11     1.1
 
-github.setup        mamedev mame mame0189
-version             0.189
+github.setup        mamedev mame mame0200
+version             0.200
 categories          emulators
 maintainers         nomaintainer
 platforms           darwin
@@ -19,8 +19,9 @@ long_description    The purpose of MAME is to preserve decades of software histo
     the hardware and how it functions. The source code to MAME serves as this \
     documentation.
 
-checksums           rmd160  766cef7dca20cab35f429799682dd12fddb16855 \
-                    sha256  73bb54ce1ae9c6173ee62254150e1fec73b8305dfaaf5bf410c33671fe2cac4d
+checksums           rmd160  5eb6bd6cdcf88363332e110a58fd9a59dc68572b \
+                    sha256  cff718b5f048eb59eb54e551461812128c00fdd424fafb29e774c29c70ef8852 \
+                    size    127392201
 
 # Fix true vs. TRUE issue with jpeg port
 patchfiles          patch-rendutil.cpp.diff
