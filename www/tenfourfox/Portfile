@@ -13,9 +13,9 @@ license             GPL-2
 description         clone of Firefox, compatible with macOS 10.4+
 long_description    ${description}
 
-checksums           rmd160  87499c0e7e19fc8a94de4cdd33fd09d8be73c69d \
-                    sha256  02cb2d72ef2ade9d91a6734fdd521d45c25117845ed0fd32071d6e7160912b14 \
-                    size    257870280
+checksums           rmd160  4f971d6e093b2d6fda7ecc7f925be80601931b51 \
+                    sha256  ea7ee4f32e044181f2aae98e7c5e2b40577ed29d1ea36c393dbf1b90b3bd463c \
+                    size    257869060
 
 # verify we have the SDK
 platform macosx {
