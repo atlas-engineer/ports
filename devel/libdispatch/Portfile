@@ -1,0 +1,22 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+PortSystem              1.0
+PortGroup               cmake 1.1
+
+name                    libdispatch
+version                 913.30.4
+categories              devel
+license                 APSL
+platforms               darwin
+
+maintainers             {kencu @kencu} openmaintainer
+description             ${name}
+long_description        ${description}
+homepage                http://www.apple.org
+
+master_sites            https://opensource.apple.com/tarballs/${name}/
+
+checksums               sha256  dfc4686e690444c1331a208adce505d36d6f95d8be9077c6c5250bd43da0f273 \
+                        rmd160  23af12b75ebb4e4a5490f0ae1cd50bbcb7096de3 \
+                        size    462832
+
+configure.args-append   -DENABLE_TESTING=OFF
