@@ -9,6 +9,7 @@ maintainers         {kencu @kencu} openmaintainer
 license             GPL-2
 name                tenfourfox
 subport             tenfourfox-devel {}
+supported_archs     i386
 
 if {${subport} eq "tenfourfox"} {
     
@@ -50,16 +51,19 @@ platform macosx {
     }
 }
 
-platform darwin 8 {
-    # darwin 8 verify we have strip7
-    # TODO: add a dep for strip7 on Tiger
+platform darwin powerpc {
+    # darwin powerpc verify we have strip7
+    # TODO: add a dep for strip7 on powerpc
     # will need a port for that first, tho
     
     # also, there's the enhanced ld64-97 to consider for Tiger
+
     if {![file exists ${prefix}/bin/strip7]} {
         pre-fetch { ui_error "Building $name @${version} requires strip7 to be installed in ${prefix}/bin" }
     }
-} else {
+}
+
+platform darwin i386 {
     post-extract { reinplace "s|/opt/local/bin/strip7|${prefix}/bin/strip|g" ${worksrcpath}/configure.in }
 }
 
@@ -111,6 +115,10 @@ platform darwin i386 {
     patchfiles-append   patch-ots-stdlog-fix.diff
     patchfiles-append   patch-ycbcr-assembly-fix.diff
     patchfiles-append   patch-libvpx-makefiles-fix.diff
+
+    #extra patches to support ion
+    patchfiles-append   patch-js-src-asmjs-asmjssignalhanders-cpp-register-structure.diff
+    patchfiles-append   patch-js-src-irregexp-nativeregexpmacroassembler-cpp.diff
 }
 
 use_autoconf        yes
