@@ -1,0 +1,103 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           python 1.0
+PortGroup           github 1.0
+
+github.setup        wbsoft frescobaldi 2.20.0 v
+revision            1
+conflicts           frescobaldi-devel
+categories          editors python
+maintainers         {gmail.com:davide.liessi @dliessi} openmaintainer
+description         A LilyPond sheet music text editor
+long_description    Frescobaldi is an advanced text editor \
+                    to edit LilyPond sheet music files. \
+                    Features include an integrated PDF preview \
+                    and a powerful Score Wizard.
+homepage            http://www.frescobaldi.org/
+platforms           darwin
+license             GPL-2+
+
+github.tarball_from releases
+
+checksums           rmd160  27f121545cc7efe6a2b10fa69490a5714655f729 \
+                    sha256  c3d7faab7b21ddbab98749751a94d0a848138a800b0ae744f0ec94000b459ae4
+
+subport frescobaldi-devel {
+    conflicts           frescobaldi
+    version             20170217
+    set devel_version   2.20.0
+}
+
+depends_run-append  port:portmidi
+
+python.default_version  36
+configure.env-append PKG_CONFIG_PATH=${prefix}/libexec/poppler-qt4-mac/lib/pkgconfig
+build.env-append PKG_CONFIG_PATH=${prefix}/libexec/poppler-qt4-mac/lib/pkgconfig
+
+
+depends_build-append    port:py${python.version}-setuptools
+depends_lib-append      port:py${python.version}-ly
+
+depends_run-append  port:py${python.version}-pyqt4 \
+                    port:py${python.version}-poppler-qt4
+
+variant app description {Make application bundle} {
+    depends_build-append    port:py${python.version}-py2app
+}
+default_variants    +app
+
+if {![variant_isset app]} {
+    supported_archs     noarch
+}
+
+build {
+    if {[variant_isset app]} {
+        if {[info exists devel_version]} {
+            set bundle_version    ${devel_version}-${version}
+        } else {
+            set bundle_version    ${version}
+        }
+
+        system -W ${worksrcpath} "${prefix}/bin/python${python.branch} \
+            macosx/mac-app.py -f -v ${bundle_version} -s ${prefix}/bin/frescobaldi"
+    }
+}
+
+post-destroot {
+    set share_destroot ${destroot}${prefix}/share
+    set share_python ${python.prefix}/share
+
+    set man_dir /man/man1
+    xinstall -d ${share_destroot}${man_dir}
+    ln -s ${share_python}${man_dir}/frescobaldi.1 ${share_destroot}${man_dir}
+
+    set desktop_dir /applications
+    xinstall -d ${share_destroot}${desktop_dir}
+    ln -s ${share_python}${desktop_dir}/frescobaldi.desktop ${share_destroot}${desktop_dir}
+
+    set icons_dir /icons/hicolor/scalable/apps
+    xinstall -d ${share_destroot}${icons_dir}
+    ln -s ${share_python}${icons_dir}/frescobaldi.svg ${share_destroot}${icons_dir}
+
+    set doc_dir ${share_destroot}/doc/${subport}
+    xinstall -d ${doc_dir}
+    xinstall -m 644 -W ${worksrcpath} \
+        COPYING \
+        ChangeLog \
+        README.md \
+        THANKS \
+        ${doc_dir}
+
+    if {[variant_isset app]} {
+        file copy ${worksrcpath}/dist/Frescobaldi.app ${destroot}${applications_dir}
+    }
+}
+
+notes \
+"You may want to install FluidSynth and obtain a SoundFont\
+in order to have audio output from Frescobaldi's MIDI output.
+
+You will need to select FluidSynth's MIDI input port\
+in Frescobaldi's MIDI settings (in Preferences)\
+while FluidSynth is running."

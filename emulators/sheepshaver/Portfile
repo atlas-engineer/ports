@@ -1,0 +1,102 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           github 1.0
+
+github.setup        cebix macemu 1c9b21f580501c5d5833935375945479c5651964
+version             20171215
+checksums           rmd160  297cd3d06818cec3e567adb0b19b3fc3d7334afb \
+                    sha256  54064cde03e8b5b2d18f2d4bda1dae45502dfb3c94297fd1dc606ff15ef20321
+
+# we need a name here as the github-supplied name is not correct for this port
+name                sheepshaver
+subport             ${name}-gui {}
+
+categories          emulators
+license             GPL-2+
+platforms           darwin
+maintainers         {kencu @kencu} openmaintainer
+
+homepage            http://sheepshaver.cebix.net/
+
+description         PowerPC Mac OS run-time environment
+
+long_description    SheepShaver is an Open Source PowerPC Mac OS run-time \
+					environment. That is, it enables you to run PowerPC \
+					Classic Mac OS software on your computer, even if you are \
+					using a different operating system. However, you still \
+					need a copy of Mac OS and a Power Macintosh ROM image to \
+					use this program.
+
+worksrcdir          ${distname}/SheepShaver/src/Unix
+
+#pre-configure {
+#    system -W "${worksrcpath}/../../" "make links"
+#}
+
+configure.cmd       ./autogen.sh
+configure.optflags  -O3
+
+patchfiles-append   patch-001-sheepshaver-makefile-in-ditto-patch.diff
+
+depends_build       port:autoconf \
+                    port:pkgconfig \
+                    port:automake
+
+set sheepshaver_dir /SheepShaver
+
+if {${subport} eq ${name}} {
+
+	depends_lib         port:libsdl \
+	                    port:${name}-gui
+
+    # no need for gui to be same architecture as the emulator
+    depends_skip_archcheck-append \
+                        ${name}-gui
+    	
+	configure.args      --disable-vosf \
+						--without-esd  \
+						--without-mon  \
+						--enable-sdl-video \
+						--enable-sdl-audio \
+						--enable-jit-compiler \
+						--enable-standalone-gui \
+						--without-gtk
+
+# attempts at 32bit build - not working as yet
+#    supported_archs     i386
+#    compiler.whitelist  macports-gcc-6
+#    configure.cppflags-append -fpermissive
+#    configure.ldflags-append -m32
+#	configure.args-append    --enable-addressing=direct
+	
+	build.target        SheepShaver SheepShaver_app
+	
+	post-destroot {
+		file mkdir ${destroot}${applications_dir}${sheepshaver_dir}
+		copy ${filespath}/SheepShaver_idiosyncracies.txt ${destroot}${applications_dir}${sheepshaver_dir}
+		copy ${worksrcpath}/SheepShaver.app ${destroot}${applications_dir}${sheepshaver_dir}
+		file delete ${destroot}${prefix}/bin/SheepShaver
+	}
+
+} elseif {${subport} eq "${name}-gui"} {
+
+    description         Graphical user interface to configure SheepShaver.
+    long_description    ${description}
+
+    depends_lib         port:gtk2
+
+    configure.args      --disable-vosf \
+                        --without-esd  \
+                        --without-mon \
+                        --enable-standalone-gui \
+                        --with-gtk=gtk2
+                        
+    build.target        SheepShaverGUI_app
+    
+    destroot {
+        file mkdir ${destroot}${applications_dir}${sheepshaver_dir}
+        copy ${worksrcpath}/SheepShaverGUI.app ${destroot}${applications_dir}${sheepshaver_dir}
+    }
+
+}

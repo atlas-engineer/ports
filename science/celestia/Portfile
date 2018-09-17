@@ -1,0 +1,36 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+
+#PortGroup           github 1.0
+#github.setup        CelestiaProject Celestia 80a1abbd523017e1b75053d0ec136b831a82960e
+#version             20180804
+
+name                celestia
+version             1.6.1
+use_zip             yes
+
+homepage            https://celestia.space
+master_sites        ${homepage}/files/${name}/${version}/
+
+categories          science
+platforms           darwin
+license             GPL-2+
+maintainers         {kencu @kencu} openmaintainer
+
+description         Real-time space simulation that lets you experience our \
+                    universe in three dimensions.
+long_description    ${description}
+
+checksums           rmd160  6661afaa09af3059a8fc3095d5b8d819a69aa5c6 \
+                    sha256  5c04a7ac2c28838efebfa15f0c7734f7891eb8d60e49646bfa0258b7c0c855d2 \
+                    size    53225571
+                    
+pre-configure {
+    system -W ${worksrcpath} "chmod a+x configure"
+}
+
+configure.args-append \
+                    --disable-rpath \
+                    --with-glut \
+                    --disable-static

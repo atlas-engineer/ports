@@ -1,0 +1,35 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           perl5 1.0
+
+perl5.branches      5.24
+perl5.setup         XML-Compile 1.58
+#perl5.setup         XML-Compile 1.58 ../by-authors/id/M/MA/MARKOV
+
+platforms           darwin
+maintainers         nomaintainer
+#license             {Artistic-1 GPL}
+license             unknown
+
+# Uncomment this line if you know there will be no arch-specific code:
+#supported_archs     noarch
+
+description         XML::Compile (no description available)
+
+long_description    ${description}
+
+checksums           rmd160  8aca2e576fae210be4b3c0c8fccb55440eb12839 \
+                    sha256  2a5abac1ab48ae75dfd9b5d0fe2c397401ae1f83d19969bc4328ce6f61532cd5 \
+                    size    207307
+
+if {${perl5.major} != ""} {
+    depends_lib-append \
+                    port:p${perl5.major}-log-report \
+                    port:p${perl5.major}-test-deep \
+                    port:p${perl5.major}-types-serialiser \
+                    port:p${perl5.major}-xml-compile-tester \
+                    port:p${perl5.major}-xml-libxml
+}
+
+

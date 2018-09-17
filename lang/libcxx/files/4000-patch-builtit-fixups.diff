@@ -1,0 +1,34 @@
+diff --git libcxx-5.0.1.src/lib/buildit libcxx-5.0.1.src/lib/buildit
+index e1ef338..d6873c8 100755
+--- libcxx-5.0.1.src/lib/buildit
++++ libcxx-5.0.1.src/lib/buildit
+@@ -45,8 +45,8 @@ then
+   RC_ProjectSourceVersion=1
+ fi
+ 
+-EXTRA_FLAGS="-nostdinc++ -std=${CXX_LANG} -fstrict-aliasing -Wall -Wextra -Wshadow -Wconversion \
+-             -Wstrict-aliasing=2 -Wstrict-overflow=4 -D_LIBCPP_BUILDING_LIBRARY "
++EXTRA_FLAGS="-nostdinc++ -std=c++11 -fstrict-aliasing -Wall -Wextra -Wshadow -Wconversion \
++             -Wstrict-aliasing=2 -Wstrict-overflow=4  "
+ 
+ case $TRIPLE in
+   *-apple-*)
+diff --git libcxxabi-5.0.1.src/lib/buildit libcxxabi-5.0.1.src/lib/buildit
+index d03e0e6..9d3f693 100755
+--- libcxxabi-5.0.1.src/lib/buildit
++++ libcxxabi-5.0.1.src/lib/buildit
+@@ -27,12 +27,12 @@ then
+   RC_ProjectSourceVersion=1
+ fi
+ 
+-EXTRA_FLAGS="-std=c++11 -stdlib=libc++ -fstrict-aliasing -Wstrict-aliasing=2 \
++EXTRA_FLAGS="-std=c++11 -fstrict-aliasing -Wstrict-aliasing=2 \
+              -Wsign-conversion -Wshadow -Wconversion -Wunused-variable \
+              -Wmissing-field-initializers -Wchar-subscripts -Wmismatched-tags \
+              -Wmissing-braces -Wshorten-64-to-32 -Wsign-compare \
+              -Wstrict-aliasing=2 -Wstrict-overflow=4 -Wunused-parameter \
+-             -Wnewline-eof -D_LIBCPP_BUILDING_LIBRARY"
++             -Wnewline-eof "
+ 
+ case $TRIPLE in
+   *-apple-*)

@@ -30,4 +30,7 @@ depends_lib             port:libsdl_mixer \
 patchfiles              patch-m4-boost.diff
 
 use_autoreconf          yes
+
+# the following did not work. had to change it directly in configure
+configure.env-append    LIBFASTDB='/opt/local/lib/libfastdb_r.2.dylib'
 configure.args          --disable-sdltest

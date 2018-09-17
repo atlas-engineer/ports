@@ -1,0 +1,11 @@
+--- config.lib.old	2017-12-26 16:05:30.000000000 -0800
++++ config.lib	2017-12-26 16:05:50.000000000 -0800
+@@ -1460,7 +1460,7 @@
+ 	# Special CXXFlags for HOST
+ 	CXXFLAGS="$CXXFLAGS"
+ 	# Libs to compile. In fact this is just LDFLAGS
+-	LIBS="-lstdc++"
++	LIBS=""
+ 	# LDFLAGS used for HOST
+ 	LDFLAGS="$LDFLAGS"
+ 	# FEATURES for HOST (lto)

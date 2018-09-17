@@ -1,0 +1,129 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           compiler_blacklist_versions 1.0
+
+name                epiphany
+version             3.29.3
+license             GPL-2+
+set branch          [join [lrange [split ${version} .] 0 1] .]
+description         A GNOME Web browser.
+long_description    A web browser is more than an application, it is a \
+                    way of thinking, it is a way of seeing the world. \
+                    Epiphany's principles are simplicity and standards \
+                    compliance.
+maintainers         {devans @dbevans} openmaintainer
+categories          gnome www
+platforms           darwin
+homepage            https://wiki.gnome.org/Apps/Web
+master_sites        gnome:sources/${name}/${branch}/
+
+use_xz              yes
+
+# 3.28.3.1
+#checksums           rmd160  82cf228a8c45699cf0cfdded63de3e5a51cd968d \
+#                    sha256  690546a701f046c5c2b3a092659589ea6e17cb0f9a81ec3fdb3046b00cede6f7 \
+#                    size    4475124
+
+# 3.29.3 - requires libdazzle, not yet in MacPorts
+checksums           rmd160  2d453899321ae23e26604d6ffa7992861b109c81 \
+                    sha256  d360d9301da8a834f4fee56e246a1bfc7641a3c8d5ed78090e550deea5ad3ee8 \
+                    size    4493268
+
+depends_build-append \
+                    port:pkgconfig \
+                    port:meson \
+                    port:ninja \
+                    port:intltool \
+                    port:gnome-common \
+                    port:autoconf \
+                    port:automake \
+                    port:libtool \
+                    port:appstream-glib \
+                    port:itstool \
+                    port:yelp-tools \
+                    port:python36
+
+
+depends_lib-append  port:desktop-file-utils \
+                    port:gtk3 \
+                    port:gnome-desktop \
+                    port:libxslt\
+                    port:libsoup \
+                    port:libsecret \
+                    port:port:libnotify \
+                    port:gsettings-desktop-schemas \
+                    port:sqlite3 \
+                    port:gcr \
+                    port:avahi \
+                    port:xorg-libX11 \
+                    port:iso-codes \
+                    port:libhttpseverywhere \
+                    port:gmp
+
+#                    path:lib/pkgconfig/webkit2gtk-4.0.pc:webkit2-gtk \
+
+depends_run         port:adwaita-icon-theme \
+                    port:gnome-keyring
+
+# error: invalid value 'gnu11' in '-std=gnu11'
+compiler.blacklist-append  *gcc-3.* *gcc-4.* {clang < 212}
+
+# specify a python3 version
+patchfiles          patch-post-install-python.diff
+post-patch {
+    reinplace "s|@@PYTHON3@@|${prefix}/bin/python3.6|g" post_install.py
+}
+
+configure.cmd       meson
+configure.post_args . build
+
+# meson requires builds be in build subdir
+build.dir           ${worksrcpath}/build
+build.cmd           ninja
+build.target
+
+# DESTDIR must come before ninja command rather than after
+destroot.dir        ${worksrcpath}/build
+destroot.cmd        DESTDIR=${destroot} ninja
+destroot.destdir
+
+# meson ninja backend improperly sets shared library install name
+# based on build_dir rather than install_dir
+post-destroot {
+    set libname ${prefix}/lib/epiphany/libephymain.dylib
+    system "install_name_tool -id ${libname} ${destroot}${libname}"
+
+    set libname ${prefix}/lib/epiphany/libephymisc.dylib
+    system "install_name_tool -id ${libname} ${destroot}${libname}"
+
+    set libname ${prefix}/lib/epiphany/libephysync.dylib
+    system "install_name_tool -id ${libname} ${destroot}${libname}"
+    
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/libephymain.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/libephysync.dylib"
+
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib      ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/bin/epiphany"
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/bin/epiphany"
+
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib      ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany/ephy-profile-migrator"
+
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/src/libephymain.dylib      ${prefix}/lib/epiphany/libephymain.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/libexec/epiphany-search-provider"
+
+    system "install_name_tool -change ${build.dir}/lib/sync/libephysync.dylib ${prefix}/lib/epiphany/libephysync.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
+    system "install_name_tool -change ${build.dir}/lib/libephymisc.dylib      ${prefix}/lib/epiphany/libephymisc.dylib ${destroot}${prefix}/lib/epiphany/web-extensions/libephywebextension.dylib"
+}
+
+post-activate {
+    system "${prefix}/bin/update-desktop-database -q ${prefix}/share/applications"
+    system "${prefix}/bin/glib-compile-schemas ${prefix}/share/glib-2.0/schemas"
+}
+
+
+livecheck.type          gnome
