@@ -1,0 +1,37 @@
+$ diff -u project.pbxproj.orig project.pbxproj
+--- aquaterm/AquaTerm.xcodeproj/project.pbxproj.orig	2018-09-17 16:22:27.000000000 -0700
++++ aquaterm/AquaTerm.xcodeproj/project.pbxproj	2018-09-17 16:30:59.000000000 -0700
+@@ -28,7 +28,6 @@
+ 		CB3949DA0E8D7A5B00BA7404 /* AquaTerm.bridgesupport in Resources */ = {isa = PBXBuildFile; fileRef = CB3949D90E8D7A5B00BA7404 /* AquaTerm.bridgesupport */; };
+ 		CB58A20006F9A60900AF8A5E /* AQTAdapter.html in Resources */ = {isa = PBXBuildFile; fileRef = CB58A1FE06F9A60900AF8A5E /* AQTAdapter.html */; };
+ 		CB58A20106F9A60900AF8A5E /* help.html in Resources */ = {isa = PBXBuildFile; fileRef = CB58A1FF06F9A60900AF8A5E /* help.html */; };
+-		CB58A20206F9A62300AF8A5E /* help.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = CB58A1FF06F9A60900AF8A5E /* help.html */; };
+ 		CB58A23B06FA0FB600AF8A5E /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CB58A23A06FA0FB600AF8A5E /* ReadMe.rtf */; };
+ 		CB72184906072CF6008DCEAD /* ReleaseNotes in Resources */ = {isa = PBXBuildFile; fileRef = CB72184806072CF6008DCEAD /* ReleaseNotes */; };
+ 		CB91252B07CB488C001D5EAF /* AQTAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = CBF3082D04D51B9300EBD329 /* AQTAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+@@ -114,14 +113,14 @@
+ /* End PBXContainerItemProxy section */
+ 
+ /* Begin PBXCopyFilesBuildPhase section */
+-		CB58A1F406F9A53300AF8A5E /* CopyFiles */ = {
++		CB58A1F406F9A53300AF8A5E /* Copy Files */ = {
+ 			isa = PBXCopyFilesBuildPhase;
+ 			buildActionMask = 2147483647;
+ 			dstPath = "";
+ 			dstSubfolderSpec = 7;
+ 			files = (
+-				CB58A20206F9A62300AF8A5E /* help.html in CopyFiles */,
+ 			);
++			name = "Copy Files";
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+ /* End PBXCopyFilesBuildPhase section */
+@@ -550,7 +549,7 @@
+ 				CBC4B43205E4C784001BE8D7 /* Resources */,
+ 				CBC4B43B05E4C784001BE8D7 /* Sources */,
+ 				CBC4B44505E4C784001BE8D7 /* Frameworks */,
+-				CB58A1F406F9A53300AF8A5E /* CopyFiles */,
++				CB58A1F406F9A53300AF8A5E /* Copy Files */,
+ 			);
+ 			buildRules = (
+ 			);
