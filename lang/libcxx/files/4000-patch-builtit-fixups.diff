@@ -1,3 +1,17 @@
+Not sure just when I found this patch was useful, but it is not useful now with clang-5.0.
+You get the following error if you try to use it:
+
+../src/private_typeinfo.cpp:76:19: error: '~type_info' is unavailable: introduced in macOS 10.9
+__shim_type_info::~__shim_type_info()
+                  ^
+/opt/local/libexec/llvm-5.0/include/c++/v1/typeinfo:112:13: note: '~type_info' has been explicitly marked unavailable here
+    virtual ~type_info();
+            ^
+1 error generated.
+
+
+
+
 diff --git libcxx-5.0.1.src/lib/buildit libcxx-5.0.1.src/lib/buildit
 index e1ef338..d6873c8 100755
 --- libcxx-5.0.1.src/lib/buildit
