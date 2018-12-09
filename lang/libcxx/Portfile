@@ -90,7 +90,7 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
     #    compiler.blacklist-append macports-clang-${ver}
     #}
     if {[variant_isset emulated_tls]} {
-        compiler.whitelist macports-clang-7.0 
+        compiler.whitelist macports-clang-5.0 
     }
 
     supported_archs i386 x86_64 ppc
