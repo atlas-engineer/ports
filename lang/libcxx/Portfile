@@ -39,7 +39,7 @@ checksums               libcxxabi-5.0.1.src.tar.xz \
 
 
 variant universal {}
-variant emulated_tls description {build libcxxabi and libcxx with support for thread_local storage} {}
+variant emulated_tls description {build libcxxabi and libcxx with support for emulated thread_local storage} {}
 variant replacemnt_libcxx description {EXPERTS ONLY: Build a replacement libcxxabi and libcxx even if it is already part of the base OS.} {}
 
 if {${os.major} < 18} {
