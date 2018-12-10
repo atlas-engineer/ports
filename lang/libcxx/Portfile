@@ -3,8 +3,7 @@ PortGroup               compiler_blacklist_versions 1.0
 
 name                    libcxx
 epoch                   1
-version                 5.0.1
-revision                10
+version                 7.0.0
 categories              lang
 platforms               darwin
 license                 MIT NCSA
@@ -30,13 +29,14 @@ set libcxx_distname     libcxx-${version}.src
 distfiles               ${libcxxabi_distname}${extract.suffix} \
                         ${libcxx_distname}${extract.suffix}
 
-checksums               libcxxabi-5.0.1.src.tar.xz \
-                        rmd160  93b74a0644c1afd565938fba5e21b200b206c72a \
-                        sha256  5a25152cb7f21e3c223ad36a1022faeb8a5ac27c9e75936a5ae2d3ac48f6e854 \
-                        libcxx-5.0.1.src.tar.xz \
-                        rmd160  1e5a22e62515382488f232039e31f0b12c08ca4f \
-                        sha256  fa8f99dd2bde109daa3276d529851a3bce5718d46ce1c5d0806f46caa3e57c00
-
+checksums               libcxxabi-7.0.0.src.tar.xz \
+                        rmd160  d4a932989597e58f7a3f24cd67f8886b93c184d7 \
+                        sha256  9b45c759ff397512eae4d938ff82827b1bd7ccba49920777e5b5e460baeb245f \
+                        size    535792 \
+                        libcxx-7.0.0.src.tar.xz \
+                        rmd160  7dfefd22edb305f68882a5f503f31c881fe5dc05 \
+                        sha256  9b342625ba2f4e65b52764ab2061e116c0337db2179c6bce7f9a0d70c52134f0 \
+                        size    1652496
 
 variant universal {}
 variant emulated_tls description {build libcxxabi and libcxx with support for emulated thread_local storage} {}
@@ -46,7 +46,10 @@ if {${os.major} < 18} {
   default_variants +universal
 }
 if {${os.major} < 11} {
-  default_variants-append +emulated_tls
+  # requires a TLS-enabled clang-5.0 or better to build
+  if {[file exists ${prefix}/bin/clang-mp-5.0] || [file exists ${prefix}/bin/clang-mp-6.0] || [file exists ${prefix}/bin/clang-mp-7.0]} {
+    default_variants-append +emulated_tls
+  }
 }
 use_configure no
 
@@ -78,28 +81,58 @@ platform darwin {
 }
 
 if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
-    compiler.blacklist *gcc* {clang < 500}
 
-    clang 3.5 and newer are conditionally blacklisted to prevent dependency cycles
-    foreach ver {3.5 3.6 3.7 3.8 3.9 4.0 5.0 devel} {
+    supported_archs i386 x86_64 ppc
+
+    # clang 3.5 and newer are conditionally blacklisted to prevent dependency cycles
+    foreach ver {3.5 3.6 3.7 3.8 3.9 4.0 5.0 6.0 7.0 devel} {
         if {![file exists ${prefix}/bin/clang-mp-${ver}]} {
             compiler.blacklist-append macports-clang-${ver}
         }
     }
 
     # clang 3.8 and newer are blacklisted due to a build failure in stdlib.h that needs to ne triaged
-    #foreach ver {3.8 3.9 4.0 5.0 devel} {
-    #    compiler.blacklist-append macports-clang-${ver}
-    #}
-    if {[variant_isset emulated_tls]} {
-        compiler.whitelist macports-clang-5.0 
+    # this has been somewhat sorted out.
+    # clang-3.4 or clang-3.7 need the following include dir to build the library: -I${libcxx_worksrcpath}/include
+    # clang-3.9, clang-4.0: neither include dir individually will work, both don't work -- these compilers cannot presently build this library with the buildit script
+    # clang-5.0, clang-6.0, clang-7.0  need the following include dir to build the library: -I${libcxxabi_worksrcpath}/include
+
+	set includedirs {}
+
+    if {[file exists /usr/lib/libc++.dylib]} {
+
+		if {[variant_isset emulated_tls]} {
+			# for this, we need a TLS-capable compiler, and only a TLS-capable compiler
+			compiler.whitelist macports-clang-7.0 macports-clang-6.0 macports-clang-5.0 {clang > 800 }
+			compiler.fallback
+			set includedirs -I${libcxxabi_worksrcpath}/include
+		} else {
+			# we have libc++, we don't want emulated tls -- we're just trying to upgrade
+			compiler.blacklist *gcc* {clang < 500} macports-clang-3.4 macports-clang-3.7 macports-clang-3.9 macports-clang-4.0
+			set includedirs -I${libcxxabi_worksrcpath}/include
+		}
+
+    } else {
+
+        # we are bootstrapping libc++ into a system without it
+        foreach ver {3.7 3.8 3.9 4.0 5.0 6.0 7.0 devel} {
+          compiler.blacklist-append macports-clang-${ver}
+        }
+        compiler.whitelist macports-clang-3.4
+        compiler.fallback
+        set includedirs -I${libcxx_worksrcpath}/include
+
     }
 
-    supported_archs i386 x86_64 ppc
 
+    # we already have libc++ installed, but now we're building a universal version with PPC slice
+    # we can improve on this plan with more testing -- most likely clang-7.0 would be best
+    # but will need a fat set of supporting libraries
     if {[variant_isset universal] && [lsearch ${universal_archs} ppc] != -1} {
         # http://trac.macports.org/wiki/LibcxxOnOlderSystems#Leopardppc
-       # compiler.whitelist macports-clang-3.7 macports-clang-3.6
+        compiler.whitelist macports-clang-3.7 
+        compiler.fallback
+        set includedirs -I${libcxx_worksrcpath}/include
     }
 
     post-extract {
@@ -159,7 +192,7 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
         CXX="${configure.cxx} ${cxx_stdlibflags}"  \
         RC_XBS=1 \
         RC_ProjectSourceVersion="${version}" \
-        RC_CFLAGS="[get_canonical_archflags] -I${libcxxabi_worksrcpath}/include  ${configure.optflags}" \
+        RC_CFLAGS="[get_canonical_archflags] ${includedirs}  ${configure.optflags}" \
         TRIPLE="-apple-darwin${os.major}"
     build.args-append \
         LIBCXXABI_PATH=${libcxxabi_worksrcpath} \
@@ -167,10 +200,6 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
         LIBCXXABI_DYLIB_PATH=${build.dir}/libc++abi.dylib \
         TRIPLE=-apple-darwin${os.major} \
         MACOSX_DEPLOYMENT_TARGET=${macosx_deployment_target}
-
-# clang-3.4 or clang-3.7 to build the library: -I${libcxx_worksrcpath}/include
-# clang-4.0: neither one individually will work, both don't work
-# clang-5.0, clang-7.0 to build the library: -I${libcxxabi_worksrcpath}/include
 
     # We want to use the host's libc++ everywhere because we want to ensure
     # that only *ONE* copy of this library is in any process's address space.

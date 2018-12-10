@@ -12,10 +12,10 @@ __shim_type_info::~__shim_type_info()
 
 
 
-diff --git libcxx-5.0.1.src/lib/buildit libcxx-5.0.1.src/lib/buildit
+diff --git libcxx-7.0.0.src/lib/buildit libcxx-7.0.0.src/lib/buildit
 index e1ef338..d6873c8 100755
---- libcxx-5.0.1.src/lib/buildit
-+++ libcxx-5.0.1.src/lib/buildit
+--- libcxx-7.0.0.src/lib/buildit
++++ libcxx-7.0.0.src/lib/buildit
 @@ -45,8 +45,8 @@ then
    RC_ProjectSourceVersion=1
  fi
@@ -27,10 +27,10 @@ index e1ef338..d6873c8 100755
  
  case $TRIPLE in
    *-apple-*)
-diff --git libcxxabi-5.0.1.src/lib/buildit libcxxabi-5.0.1.src/lib/buildit
+diff --git libcxxabi-7.0.0.src/lib/buildit libcxxabi-7.0.0.src/lib/buildit
 index d03e0e6..9d3f693 100755
---- libcxxabi-5.0.1.src/lib/buildit
-+++ libcxxabi-5.0.1.src/lib/buildit
+--- libcxxabi-7.0.0.src/lib/buildit
++++ libcxxabi-7.0.0.src/lib/buildit
 @@ -27,12 +27,12 @@ then
    RC_ProjectSourceVersion=1
  fi
