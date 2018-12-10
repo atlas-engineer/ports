@@ -153,8 +153,8 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
 
     build.dir ${workpath}/build
     build.env-append \
-       CC="${configure.cc}" \
-        CXX="${configure.cxx} -D__need_malloc_and_calloc"  \
+        CC="${configure.cc}" \
+        CXX="${configure.cxx} ${cxx_stdlibflags}"  \
         RC_XBS=1 \
         RC_ProjectSourceVersion="${version}" \
         RC_CFLAGS="[get_canonical_archflags] -I${libcxxabi_worksrcpath}/include  ${configure.optflags}" \
@@ -164,9 +164,11 @@ if {${os.major} < 11 || [variant_isset replacemnt_libcxx]} {
         LIBCXX_PATH=${libcxx_worksrcpath} \
         LIBCXXABI_DYLIB_PATH=${build.dir}/libc++abi.dylib \
         TRIPLE=-apple-darwin${os.major} \
-        CXX="${configure.cxx} ${cxx_stdlibflags}" \
         MACOSX_DEPLOYMENT_TARGET=${macosx_deployment_target}
-        
+
+# clang-3.4 or clang-3.7 to build the library: -I${libcxx_worksrcpath}/include
+# clang-4.0: neither one individually will work, both don't work
+# clang-5.0, clang-7.0 to build the library: -I${libcxxabi_worksrcpath}/include
 
     # We want to use the host's libc++ everywhere because we want to ensure
     # that only *ONE* copy of this library is in any process's address space.
