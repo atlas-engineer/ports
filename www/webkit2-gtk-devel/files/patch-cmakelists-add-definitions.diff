@@ -4,7 +4,7 @@
      set(ENABLE_TOOLS ON)
  endif ()
  
-+add_definitions(-D__STDC_FORMAT_MACROS)
++add_definitions(-D__STDC_FORMAT_MACROS -DTARGET_OS_IOS=0)
 +
  # -----------------------------------------------------------------------------
  # Determine which port will be built
