@@ -71,7 +71,6 @@ depends_lib-append  port:atk \
 # PR-152650-2.patch: WIP to re-enable gtk-doc support
 # PR-153138.patch: https://bugs.webkit.org/show_bug.cgi?id=153138
 # PR-157574.patch: https://bugs.webkit.org/show_bug.cgi?id=157574
-# patch-name-conflicts.diff -- fixes namespace collisions with MacTypes.h
 
 patchfiles-append \
     PR-152650-2.patch \
@@ -102,12 +101,26 @@ configure.args-append \
     -DENABLE_PLUGIN_PROCESS_GTK2=OFF \
     -DENABLE_VIDEO=ON
 
+### Testing ###
+# the new libraries are not found in ./lib during testing; an rpath thing likely
+# to workaround this, first uncomment the below lines, then build it all with sudo port -v test
+# then when the tests fail, install it with sudo port -v -o -k install
+# then copy ${build_dir}/lib/libgtest.dylib to ${prefix}/lib/ and then
+# run the tests again with sudo port -v test or just manually in the build dir with ctest -VV
+# Enable these lines to allow testing:
+# configure.args-append -DENABLE_API_TESTS=ON
+# test.run yes
+
+
 # TODO: File a bug about this not working
 configure.args-append -DENABLE_GTKDOC=OFF
 
 # <rdar://problem/24031030>
 configure.optflags  -Os
 
+# clang 3.3 (error: no type named 'make_index_sequence' in namespace 'std')
+# clang 3.4, 503.0.35, and 600.0.57 (error: call to 'make_unique' is ambiguous, error: call to 'exchange' is ambiguous)
+# clangs between 602 and 902 -- exact error not recorded, could be retested
 compiler.blacklist-append {clang < 902.0.39.2} macports-clang-3.4 macports-clang-3.3
 compiler.fallback-append macports-clang-5.0 macports-clang-4.0 macports-clang-3.9 macports-clang-3.7
 
@@ -117,6 +130,7 @@ pre-configure {
     }
 }
 
+# verified as of 2.23.3 the following hack is still needed and appears complete
 post-configure {
     # https://bugs.webkit.org/show_bug.cgi?id=153176
     reinplace {s|\.\./\.\./lib/libWTFGTK\.a||} \
@@ -150,6 +164,7 @@ post-configure {
         ${build.dir}/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/link.txt
 }
 
+# TO DO: Is this still needed?
 # https://trac.macports.org/ticket/41560#comment:2
 configure.cflags-append     -ftemplate-depth=256
 configure.cxxflags-append   -ftemplate-depth=256
@@ -204,7 +219,8 @@ if {${os.platform} eq "darwin" && ${os.major} <= 13} {
 
     # gl cocoa build continues to fail due to use of API not available on darwin 12 or earlier
     # so gstreamergl is not available at present for darwin 12 or earlier
-    # todo clarify further where this is exactly needed
+    # TO DO: clarify further where this is exactly needed
+    # also - see quartz variant above where this is used again
     configure.args-append -DUSE_GSTREAMER_GL=OFF
 
     # disable Apple internal security libraries, available only on new systems
@@ -216,12 +232,11 @@ if {${os.platform} eq "darwin" && ${os.major} <= 13} {
     configure.args-append -DENABLE_SUBTLE_CRYPTO=OFF
 
     # the darwin build uses security features that were Apple internal only, but
-    # the unix version does not, and seems to build OK so use that
+    # the unix version does not, so use that
     # the ifdefs were too cumbersome to sort out, so for now I just stripped those out and left
-    # the unix build behind - FIXME: sort the ifdefs out
+    # the unix build behind - TO DO: sort the ifdefs out
     # https://bugs.webkit.org/show_bug.cgi?id=157554
     patchfiles-append   patch-WTF-wtf-Randomdevice.diff
-
 
     # add dep for newer ruby and spec this for build
     # https://trac.macports.org/ticket/52016
