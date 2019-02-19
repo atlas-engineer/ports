@@ -39,7 +39,7 @@ configure.args      prefix=${prefix} CONFIG_FLAC=n CONFIG_MIKMOD=n \
                     CONFIG_WAVPACK=n CONFIG_OPUS=n CONFIG_CUE=n \
                     CONFIG_CDIO=n CONFIG_CDDB=n CONFIG_DISCID=n \
                     CONFIG_AO=y CONFIG_PULSE=n CONFIG_OSS=n \
-                    CONFIG_JACK=n CONFIG_SAMPLERATE=n \
+                    CONFIG_JACK=n CONFIG_COREAUDIO=y CONFIG_SAMPLERATE=n \
                     HOSTCC="${configure.cc}" \
                     HOST_CFLAGS="${configure.cflags}" \
                     HOST_LDFLAGS="${configure.ldflags}"
