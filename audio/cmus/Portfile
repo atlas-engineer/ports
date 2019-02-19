@@ -49,7 +49,6 @@ platform darwin powerpc {
     compiler.fallback-append macports-gcc-6 macports-gcc-7 macports-gcc-5
 }
 
-
 configure.pre_args
 configure.args      prefix=${prefix} CONFIG_FLAC=n CONFIG_MIKMOD=n \
                     CONFIG_MODPLUG=n CONFIG_MPC=n CONFIG_FFMPEG=n \
@@ -63,8 +62,8 @@ configure.args      prefix=${prefix} CONFIG_FLAC=n CONFIG_MIKMOD=n \
                     HOST_LDFLAGS="${configure.ldflags}"
 
 
-# darwin < 11 cannot build coreaudio output
-if { ${os.platform} eq "darwin" && ${os.major} < 11 } {
+# darwin < 12 cannot build coreaudio output
+if { ${os.platform} eq "darwin" && ${os.major} < 12 } {
     configure.args-replace CONFIG_COREAUDIO=y CONFIG_COREAUDIO=n
 }
 # add missing non-POSIX SIGWINCH definition for Darwin signal.h
@@ -146,6 +145,7 @@ variant pulseaudio  description {Support native PulseAudio output} {
     configure.args-append CONFIG_PULSE=y
 }
 
+# at present, jack is building on 10.7+
 variant jack  description {Support native JACK output} {
     depends_lib-append    port:jack
     configure.args-delete CONFIG_JACK=n CONFIG_SAMPLERATE=n
