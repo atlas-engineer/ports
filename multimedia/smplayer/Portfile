@@ -1,0 +1,59 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           qmake 1.0
+
+name                smplayer
+version             19.1.0
+
+categories          multimedia
+license             GPL-2+
+platforms           darwin
+maintainers         {kencu @kencu} openmaintainer
+
+homepage            http://www.smplayer.org/
+description         GUI for MPlayer
+long_description    ${description}. Uses a media player, by default MPlayer, for best performance. \
+                    Broad compatibility, and good performance on older systems.
+
+master_sites        sourceforge
+use_bzip2           yes
+
+checksums           rmd160  fcf20a6206b5dd693cafae73b5fd29a9a0af31ff \
+                    sha256  7a483d24c928fa51e8d48322cfd7d747fa5bf6cf587505d29a44c256abb64360 \
+                    size    5169546
+
+depends_build-append \
+                    port:makeicns
+
+configure.dir       ${worksrcpath}/src
+
+patchfiles          patch-smplayer.diff
+
+post-patch {
+#    reinplace "s|@@PREFIX@@|${prefix}|g" ${worksrcpath}/src/players.cpp
+    
+    system -W ${worksrcpath} "${prefix}/bin/makeicns \
+                                       -512 ./icons/smplayer_icon512.png \
+                                       -256 ./icons/smplayer_icon256.png \
+                                       -192 ./icons/smplayer_icon192.png \
+                                       -128 ./icons/smplayer_icon128.png \
+                                       -64  ./icons/smplayer_icon64.png   \
+                                       -32  ./icons/smplayer_icon32.png   \
+                                       -16  ./icons/smplayer_icon16.png   \
+                                       -out src/smplayer.icns"
+}
+
+build.dir            ${worksrcpath}/src
+
+# fixme - the translations are made, but forcing the installed app to find them
+# is proving somewhat difficult.
+
+post-build {
+    reinplace "s|com.yourcompany.smplayer|org.smplayer.smplayer|g" ${worksrcpath}/src/smplayer.app/Contents/Info.plist
+    move ${worksrcpath}/src/translations ${worksrcpath}/src/smplayer.app/Contents/Resources/
+}
+
+destroot {
+    copy ${worksrcpath}/src/smplayer.app ${destroot}${applications_dir}/smplayer.app
+}
