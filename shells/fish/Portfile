@@ -2,9 +2,9 @@
 
 PortSystem              1.0
 PortGroup               github 1.0
+PortGroup               cmake 1.1
 PortGroup               cxx11 1.1
 PortGroup               legacysupport 1.0
-PortGroup               cmake 1.1
 
 github.setup            fish-shell fish-shell 3.0.2
 name                    fish
@@ -29,17 +29,22 @@ depends_lib             port:libiconv \
                         port:gettext
 
 patchfiles              patch-remove-unguarded-availability.diff \
-                        patch-share_config_fish.diff
+                        patch-share_config_fish.diff \
+                        patch-tests-bash-check.diff
 post-patch {
     reinplace "s|@@PREFIX@@|${prefix}/bin|g"     "${worksrcpath}/share/config.fish"
 }
 
-if { ${os.platform} eq "darwin" && ${os.major} == 8 } {
-    configure.cxxflags-append -D__DARWIN_UNIX03=1
+# doxygen appears to only regenerate html files and is not needed to install man pages
+configure.args-append   -DBUILD_DOCS=OFF
+
+platform darwin 8 {
+    #/opt/local/var/macports/build/_opt_myports_shells_fish/fish/work/fish-3.0.2/src/env.cpp:436:31: error: invalid conversion from 'char*' to 'int'
+    configure.cxxflags-append -D__DARWIN_UNIX03
 }
 
-# doxygen appears to only regenerate html files and not install man pages
-configure.args-append   -DBUILD_DOCS:BOOL=OFF
+test.run                yes
+test.target             test
 
 notes "
 To set MacPorts' ${name} as default login shell, run:
@@ -55,3 +60,4 @@ For X clipboard integration, install the xsel port:
 
     sudo port install xsel
 "
+
