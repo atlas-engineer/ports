@@ -26,19 +26,18 @@ compiler.blacklist-append cc {*gcc-3*} {*gcc-4.[0-7]} {clang < 800.0.38}
 subport OpenBLAS-devel {}
 if {[string first "-devel" $subport] > 0} {
 
-    github.setup    xianyi OpenBLAS edb814314101940774b8f7a71cb5f8f2b720afa4
+    github.setup    kencu OpenBLAS edb814314101940774b8f7a71cb5f8f2b720afa4
     version         20190301
-    checksums       rmd160 5c74b5f3ffeacbd0b8a0a68a8cb762a6037a26e5 \
-                    sha256 deac0df860cb4fea0c0f3f0652f84a5a2ab45c935c541db6b6979055ca2acacf \
-                    size   11897406
+    checksums       rmd160 d675d06725cc888487f1477d13260f5826e7e9ef \
+                    sha256 72061e9def89cea4a33ca5a71012c260ebc2fb2befd34db154aca1c6173c91d1 \
+                    size   11897286
     revision        0
 
     name            ${github.project}-devel
     conflicts       OpenBLAS
 
     patchfiles      patch-libnoarch.devel.diff \
-                    patch-linkLib.devel.diff \
-                    patch-darwin-powerpc.diff
+                    patch-linkLib.devel.diff 
 
     github.livecheck.branch develop
 
@@ -53,7 +52,8 @@ if {[string first "-devel" $subport] > 0} {
 
     patchfiles      patch-libnoarch.release.diff \
                     patch-linkLib.release.diff  \
-                    patch-darwin-powerpc.diff
+                    patch-darwin-powerpc.diff \
+                    patch-openblas-powermac970-fix.diff
 }
 
 compilers.choose    fc 
@@ -74,9 +74,6 @@ pre-build {
             puts $makeINC "CC = ${configure.cc}"
             puts $makeINC "FC = ${configure.fc}"
 
-            if { ${build_arch} eq "ppc" || ${build_arch} eq "ppc64"} {
-                puts $makeINC "TARGET = PPCG4"
-            }
             if {${arch} eq "x86_64" || ${arch} eq "ppc64"} {
                 puts $makeINC "BINARY = 64"
             } else {
@@ -112,10 +109,6 @@ pre-build {
         puts $makeINC "CC = ${configure.cc}"
         puts $makeINC "FC = ${configure.fc}"
         
-        if { ${build_arch} eq "ppc" || ${build_arch} eq "ppc64"} {
-            puts $makeINC "TARGET = PPCG4"
-        }
-
         if {${build_arch} eq "x86_64" || ${build_arch} eq "ppc64"} {
             puts $makeINC "BINARY = 64"
         } else {
@@ -149,6 +142,15 @@ pre-build {
 
 depends_build-append port:cctools
 build.args          "AR=${prefix}/bin/ar RANLIB=${prefix}/bin/ranlib"
+
+platform darwin 8 {
+    depends_build-append    port:gmake
+    build.cmd               ${prefix}/bin/gmake
+    
+    depends_test-append     port:gmake
+    test.cmd                build.cmd
+}
+
 
 destroot.args       "PREFIX=${prefix}"
 
