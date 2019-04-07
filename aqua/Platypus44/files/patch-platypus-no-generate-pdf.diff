@@ -1,0 +1,60 @@
+diff --git Platypus.xcodeproj/project.pbxproj Platypus.xcodeproj/project.pbxproj
+index bdd2634..de8e769 100755
+--- Platypus.xcodeproj/project.pbxproj
++++ Platypus.xcodeproj/project.pbxproj
+@@ -138,7 +138,6 @@
+ 		F4FE73A911F792F9005FC23A /* STPrivilegedTask.m in Sources */ = {isa = PBXBuildFile; fileRef = F4FE73A711F792F9005FC23A /* STPrivilegedTask.m */; };
+ 		F4FE745611F7933A005FC23A /* STPrivilegedTask.m in Sources */ = {isa = PBXBuildFile; fileRef = F4FE73A711F792F9005FC23A /* STPrivilegedTask.m */; };
+ 		F4FE747B11F79399005FC23A /* platypus_command_line_tool.m in Sources */ = {isa = PBXBuildFile; fileRef = F4FE747A11F79399005FC23A /* platypus_command_line_tool.m */; };
+-		F4FE748011F793CF005FC23A /* platypus.man.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F4FE747F11F793CF005FC23A /* platypus.man.pdf */; };
+ 		F4FE74C011F795EC005FC23A /* ScriptExec in Resources */ = {isa = PBXBuildFile; fileRef = F4FE74BF11F795EC005FC23A /* ScriptExec */; };
+ /* End PBXBuildFile section */
+ 
+@@ -732,7 +731,6 @@
+ 			buildPhases = (
+ 				F4E1F6F911F758FB007EE2E3 /* Sources */,
+ 				F4E1F6FA11F758FB007EE2E3 /* Frameworks */,
+-				F4E1F74611F75B67007EE2E3 /* ShellScript */,
+ 			);
+ 			buildRules = (
+ 			);
+@@ -753,7 +751,11 @@
+ 			};
+ 			buildConfigurationList = F41B2181085CD8FF00B63B0D /* Build configuration list for PBXProject "Platypus" */;
+ 			compatibilityVersion = "Xcode 3.0";
++			developmentRegion = English;
+ 			hasScannedForEncodings = 1;
++			knownRegions = (
++				en,
++			);
+ 			mainGroup = 29B97314FDCFA39411CA2CEA /* Platypus */;
+ 			projectDirPath = "";
+ 			projectRoot = "";
+@@ -798,7 +800,6 @@
+ 				F4E1F74F11F75BBD007EE2E3 /* platypus in Resources */,
+ 				F48B7C9011F769DD00351575 /* InfoPlist.strings in Resources */,
+ 				F48B7C9111F769DD00351575 /* MainMenu.nib in Resources */,
+-				F4FE748011F793CF005FC23A /* platypus.man.pdf in Resources */,
+ 				F4FE74C011F795EC005FC23A /* ScriptExec in Resources */,
+ 				F4C755C611F9AF8F006FB713 /* platypus.1 in Resources */,
+ 				F4185EC311FC5C2D0027C8D7 /* Credits.html in Resources */,
+@@ -850,19 +851,6 @@
+ 			shellPath = /bin/sh;
+ 			shellScript = "/bin/sh TestSuite/buildTestApps.pl\nexit 0";
+ 		};
+-		F4E1F74611F75B67007EE2E3 /* ShellScript */ = {
+-			isa = PBXShellScriptBuildPhase;
+-			buildActionMask = 2147483647;
+-			files = (
+-			);
+-			inputPaths = (
+-			);
+-			outputPaths = (
+-			);
+-			runOnlyForDeploymentPostprocessing = 0;
+-			shellPath = /bin/sh;
+-			shellScript = "/usr/bin/groff -Tps -mdoc -c 'CommandLineTool/platypus.1' | pstopdf -i -o 'CommandLineTool/platypus.man.pdf'";
+-		};
+ /* End PBXShellScriptBuildPhase section */
+ 
+ /* Begin PBXSourcesBuildPhase section */
