@@ -769,7 +769,14 @@ foreach {module module_info} [array get modules] {
             # ken - don't force deployment target to 10.7 for c++11
             patchfiles-append patch-qt54-c++11-106OK.diff
             
-            # ken -- there is a modification needed to the MacOSX10.6.sdk
+            # ken -- there are modification needed to the MacOSX10.6.sdk
+            
+            # in /Developer/usr/bin move clang and clang++ to *.orig
+            # set up symlinks to the clang and clang++ in /opt/local/bin
+            # and sudo port select the macports-clang-* you want
+            # I use macports-clang-5.0
+            
+            
             # /Developer/SDKs/MacOSX10.6.sdk/usr/include/rpcsvc/yp_prot.h
             # c++11 already defines bool, so this errors 
             # probably should be guarded with a C++11 test
