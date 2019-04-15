@@ -795,6 +795,8 @@ foreach {module module_info} [array get modules] {
 
             # allow build against MacOSX10.6.sdk
             patchfiles-append patch-qt54-qmacstyle_mac-scrollbars.diff
+            patchfiles-append patch-qt54-qcocoaintegration-backingscalefactor.diff
+            patchfiles-append patch-qt54-qcocoawindow.diff
 
 
 
