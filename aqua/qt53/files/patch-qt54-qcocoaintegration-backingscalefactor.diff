@@ -1,0 +1,15 @@
+--- src/plugins/platforms/cocoa/qcocoaintegration.mm.orig	2019-04-14 21:05:42.000000000 -0700
++++ src/plugins/platforms/cocoa/qcocoaintegration.mm	2019-04-14 21:43:43.000000000 -0700
+@@ -144,8 +144,12 @@
+ 
+ qreal QCocoaScreen::devicePixelRatio() const
+ {
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+     NSScreen * screen = osScreen();
+     return qreal(screen ? [screen backingScaleFactor] : 1.0);
++#else
++    return 1.0;
++#endif
+ }
+ 
+ QWindow *QCocoaScreen::topLevelAt(const QPoint &point) const

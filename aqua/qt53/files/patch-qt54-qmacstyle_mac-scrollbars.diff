@@ -1,0 +1,89 @@
+--- src/widgets/styles/qmacstyle_mac.mm.orig	2019-04-14 18:52:05.000000000 -0700
++++ src/widgets/styles/qmacstyle_mac.mm	2019-04-14 19:30:34.000000000 -0700
+@@ -2130,6 +2130,7 @@
+     : QCommonStyle(*new QMacStylePrivate)
+ {
+     Q_D(QMacStyle);
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+     d->receiver = [[NotificationReceiver alloc] initWithPrivate:d];
+     NotificationReceiver *receiver = static_cast<NotificationReceiver *>(d->receiver);
+ 
+@@ -2139,17 +2140,20 @@
+       object:nil];
+ 
+     d->nsscroller = [[NSScroller alloc] init];
++#endif
+     d->indicatorBranchButtonCell = nil;
+ }
+ 
+ QMacStyle::~QMacStyle()
+ {
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+     Q_D(QMacStyle);
+     [reinterpret_cast<NSScroller*>(d->nsscroller) release];
+ 
+     NotificationReceiver *receiver = static_cast<NotificationReceiver *>(d->receiver);
+     [[NSNotificationCenter defaultCenter] removeObserver:receiver];
+     [receiver release];
++#endif
+ 
+     delete qt_mac_backgroundPattern;
+     qt_mac_backgroundPattern = 0;
+@@ -2532,6 +2536,7 @@
+         }
+         break;
+     case PM_ScrollBarExtent: {
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+         if ([NSScroller preferredScrollerStyle] == NSScrollerStyleOverlay) {
+             switch (d->aquaSizeConstrain(opt, widget)) {
+             case QAquaSizeUnknown:
+@@ -2545,6 +2550,7 @@
+             }
+             break;
+         }
++#endif
+         switch (d->aquaSizeConstrain(opt, widget)) {
+         case QAquaSizeUnknown:
+         case QAquaSizeLarge:
+@@ -2735,8 +2741,12 @@
+         ret = 1;
+         break;
+     case PM_ScrollView_ScrollBarOverlap:
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+         ret = [NSScroller preferredScrollerStyle] == NSScrollerStyleOverlay ?
+                pixelMetric(PM_ScrollBarExtent, opt, widget) : 0;
++#else
++        ret = 0;
++#endif
+         break;
+     default:
+         ret = QCommonStyle::pixelMetric(metric, opt, widget);
+@@ -3050,7 +3060,9 @@
+         if ((qobject_cast<const QScrollBar *>(w) && w->parent() &&
+                 qobject_cast<QAbstractScrollArea*>(w->parent()->parent())) ||
+                 (opt && QStyleHelper::hasAncestor(opt->styleObject, QAccessible::ScrollBar))) {
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+             ret = [NSScroller preferredScrollerStyle] == NSScrollerStyleOverlay;
++#endif
+         }
+         break;
+     default:
+@@ -5370,6 +5382,7 @@
+             const bool usingYosemiteOrLater = QSysInfo::MacintoshVersion > QSysInfo::MV_10_9;
+             const bool isHorizontal = slider->orientation == Qt::Horizontal;
+ 
++#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+             if (cc == CC_ScrollBar && proxy()->styleHint(SH_ScrollBar_Transient, opt, widget)) {
+                 bool wasActive = false;
+                 CGFloat opacity = 0.0;
+@@ -5532,7 +5545,9 @@
+ 
+                 [NSGraphicsContext restoreGraphicsState];
+                 CGContextRestoreGState(cg);
+-            } else {
++            } else 
++#endif            
++            {
+                 d->stopAnimation(opt->styleObject);
+ 
+                 if (usingYosemiteOrLater && cc == CC_Slider) {

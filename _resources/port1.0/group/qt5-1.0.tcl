@@ -15,6 +15,7 @@ array set available_qt_versions {
     qt56  {qt56-qtbase  5.6}
     qt55  {qt55-qtbase  5.5}
     qt54  {qt54-qtbase  5.4}
+    qt53  {qt53-qtbase  5.3}
 }
 #qt5-kde {qt5-kde 5.8}
 
