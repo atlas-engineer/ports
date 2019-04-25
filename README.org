@@ -16,3 +16,26 @@ A collection of portfiles specific to Atlas for building webkit2-gtk.
 Your set-up is now complete and you can install ports from this ports
 tree! When a port is not found in this ports tree, it will fallback to
 the default MacPorts official source.
+
+** Transferring archives
+
+easye has slow hardware; webkit2-gtk-devel is a big build.
+
+#+begin_example
+<easye> I produced a binary from a modified port.  How do I install it on                            
+        another host?  Placing the pkg in                                                            
+        /opt/local/var/macports/software/MUMBLE/*.tbz on the new machine                             
+        didn't seem to do the trick as `port -b install MUMBLE` is building                          
+        the port instead.                                               [23:26]                      
+*** Hasimir (~hfenring@unaffiliated/hasimir) has quit: Ping timeout: 246                             
+    seconds                                                             [23:27]                      
+* easye needs a faster laptop.                                          [23:29]                      
+*** Hasimir (~hfenring@unaffiliated/hasimir) has joined channel #macports                            
+                                                                        [23:32]                      
+<jmr> easye: the full story is                                                                       
+      https://trac.macports.org/wiki/howto/ShareArchives2               [23:33]                      
+<jmr> but if you only want to transfer one archive there is a shortcut                               
+<jmr> the magic place is ${prefix}/var/macports/incoming/verified       [23:34]                      
+<easye> jmz:  thanks!                                                   [23:43]    
+#+end_example
+
