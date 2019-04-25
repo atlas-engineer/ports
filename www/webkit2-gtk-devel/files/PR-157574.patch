@@ -1,12 +1,12 @@
 --- Source/JavaScriptCore/API/WebKitAvailability.h.orig	2018-08-20 01:32:25.000000000 -0700
 +++ Source/JavaScriptCore/API/WebKitAvailability.h	2018-08-20 01:35:33.000000000 -0700
-@@ -28,46 +28,8 @@
- 
+@@ -28,50 +28,10 @@
+
  #if defined(__APPLE__)
- 
+
 -#include <AvailabilityMacros.h>
  #include <CoreFoundation/CoreFoundation.h>
- 
+
 -#if !TARGET_OS_IPHONE && __MAC_OS_X_VERSION_MIN_REQUIRED < 101100
 -/* To support availability macros that mention newer OS X versions when building on older OS X versions,
 -   we provide our own definitions of the underlying macros that the availability macros expand to. We're
@@ -44,6 +44,10 @@
 -
 -#endif /* !TARGET_OS_IPHONE && __MAC_OS_X_VERSION_MIN_REQUIRED < 101100 */
 -
- #if defined(BUILDING_GTK__)
+-#if defined(BUILDING_GTK__)
  #undef JSC_API_AVAILABLE
+ #define JSC_API_AVAILABLE(...)
+-#endif
+
+ #else
  #define JSC_API_AVAILABLE(...)
