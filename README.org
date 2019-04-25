@@ -1,0 +1,18 @@
+* Ports
+A collection of portfiles specific to Atlas for building webkit2-gtk.
+
+* Usage
+1. Clone this repository to a path of your choosing. The path is
+   irrelevant.
+2. Edit your =/opt/local/etc/macports/sources.conf= file to include a
+   link to the location of this repository on your disk.
+   + As an example, if you had cloned this repository to
+     =/var/local/ports= you would add a line above the default source
+     in =sources.conf= with the following syntax:
+     =file:///var/local/ports=
+3. After setting up your new source, you will need to execute:
+   =sudo port selfupdate= for MacPorts to update the portindex
+
+Your set-up is now complete and you can install ports from this ports
+tree! When a port is not found in this ports tree, it will fallback to
+the default MacPorts official source.
