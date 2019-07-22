@@ -2,8 +2,7 @@
 A collection of portfiles specific to Atlas.
 
 * Usage
-1. Clone this repository to a path of your choosing. The path is
-   irrelevant.
+1. Clone this repository to a path of your choosing.
 2. Edit your =/opt/local/etc/macports/sources.conf= file to include a
    link to the location of this repository on your disk.
    + As an example, if you had cloned this repository to
