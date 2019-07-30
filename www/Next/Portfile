@@ -18,10 +18,20 @@ fetch.type          git
 git.url             https://github.com/atlas-engineer/next.git
 git.branch          d920b95
 patchfiles          patch-hashbang-script.diff
-depends_lib         port:sbcl
-                    port:libfixposix
-                    port:python3.6
-                    port:py36-pyqt5
-                    port:py36-pyqt5-webengine
-                    port:dbus
+depends_build       port:sbcl
+depends_lib         port:libfixposix \
+                    port:python36 \
+                    port:py36-pyqt5 \
+                    port:py36-pyqt5-webengine \
+                    port:dbus \
                     port:dbus-python36
+
+notes "
+Before using Next, please make sure that D-Bus is running. To launch
+D-Bus you may have to execute `port load dbus`. This is because Next
+relies on D-Bus to facilitate communication between the Lisp core and
+the web view that you see on your screen.
+
+Please find the Next.app in your /Applications folder.
+"
+}
