@@ -13,3 +13,15 @@ homepage            https://next.atlas.engineer
 platforms           darwin
 supported_archs     x86_64
 license             BSD
+use_configure       no
+fetch.type          git
+git.url             https://github.com/atlas-engineer/next.git
+git.branch          d920b95
+patchfiles          patch-hashbang-script.diff
+depends_lib         port:sbcl
+                    port:libfixposix
+                    port:python3.6
+                    port:py36-pyqt5
+                    port:py36-pyqt5-webengine
+                    port:dbus
+                    port:dbus-python36
