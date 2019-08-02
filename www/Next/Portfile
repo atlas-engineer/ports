@@ -16,6 +16,7 @@ license             BSD
 use_configure       no
 fetch.type          git
 git.url             https://github.com/atlas-engineer/next.git
+git.branch          d920b95
 patchfiles          patch-hashbang-script.diff
 depends_build       port:sbcl
 depends_lib         port:libfixposix \
