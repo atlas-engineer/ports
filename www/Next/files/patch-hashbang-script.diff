@@ -1,8 +1,8 @@
---- ports/pyqt-webengine/next-pyqt-webengine.py.orig	2019-07-30 16:10:19.000000000 +0200
-+++ ports/pyqt-webengine/next-pyqt-webengine.py	2019-07-30 16:09:50.000000000 +0200
-@@ -1,3 +1,5 @@
+--- ports/pyqt-webengine/next-pyqt-webengine.py.orig	2019-08-02 12:56:15.000000000 +0200
++++ ports/pyqt-webengine/next-pyqt-webengine.py	2019-08-02 13:01:14.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
 +#!/opt/local/bin/python3.6
-+
+ 
  import logging
  import sys
- from urllib.parse import urlparse
