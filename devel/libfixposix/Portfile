@@ -17,4 +17,4 @@ fetch.type          git
 git.url             https://github.com/sionescu/libfixposix.git
 git.branch          v${version}
 use_autoreconf      yes
-depends_build       port:autoconf port:automake port:libtool
+depends_build       port:autoconf port:automake port:libtool port:pkgconfig
