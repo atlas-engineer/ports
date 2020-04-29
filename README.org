@@ -3,14 +3,14 @@ A collection of portfiles specific to Atlas.
 
 * Usage
 1. Clone this repository to a path of your choosing. A good, known
-   working with is =/private/tmp=.
+   working directory is =/private/tmp=.
 2. Edit your =/opt/local/etc/macports/sources.conf= file to include a
    link to the location of this repository on your disk.
    + As an example, if you had cloned this repository to
      =/var/local/ports= you would add a line above the default source
      in =sources.conf= with the following syntax:
      =file:///var/local/ports=
-3. Within the ports tree (this repository) execute =sudo portindex= to
+3. Within the ports tree (this repository) execute =portindex= to
    recreate the port tree index.
 4. After setting up your new source, you will need to execute: =sudo
    port selfupdate= for MacPorts to update its sources.
