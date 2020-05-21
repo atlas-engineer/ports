@@ -1,0 +1,25 @@
+--- Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp.orig	2020-05-20 13:59:30.000000000 +0200
++++ Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp	2020-05-21 20:15:30.000000000 +0200
+@@ -45,22 +45,18 @@
+ 
+ static String findWebKitProcess(const char* processName)
+ {
+-#if ENABLE(DEVELOPER_MODE)
+     static const char* execDirectory = g_getenv("WEBKIT_EXEC_PATH");
+     if (execDirectory) {
+         String processPath = FileSystem::pathByAppendingComponent(FileSystem::stringFromFileSystemRepresentation(execDirectory), processName);
+         if (FileSystem::fileExists(processPath))
+             return processPath;
+     }
+-
+     static String executablePath = getExecutablePath();
+     if (!executablePath.isNull()) {
+         String processPath = FileSystem::pathByAppendingComponent(executablePath, processName);
+         if (FileSystem::fileExists(processPath))
+             return processPath;
+     }
+-#endif
+-
+     return FileSystem::pathByAppendingComponent(FileSystem::stringFromFileSystemRepresentation(PKGLIBEXECDIR), processName);
+ }
+ 
