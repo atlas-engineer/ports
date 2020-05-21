@@ -91,6 +91,10 @@ patchfiles-append    patch-enable-plugin-architecture-unix.diff
 # runs without this patch.
 patchfiles-append    patch-bundle-link-webcore.diff
 
+# allow the webkit executables typically located in libexec to be
+# dynamically located, this is useful for app bundling
+patchfiles-append    process-executable-path.diff
+
 # it is preferred to use the WebKit built in bmalloc if it builds on a given os.
 # it has improved security features, but not all systems can build it at present.
 
