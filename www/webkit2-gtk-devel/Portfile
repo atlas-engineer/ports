@@ -222,7 +222,7 @@ notes-append "
 If you are porting new software to use webkit2gtk on Apple systems,\
 you will likely need to define BUILDING_GTK__ to get the correct\
 behaviour from WebKitAvailability.h. Execute port contents to find\
-this file.
+this file and edit it.
 "
 
 livecheck.type      regex
