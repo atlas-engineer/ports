@@ -2,20 +2,20 @@
 
 PortSystem          1.0
 
-name                Next
+name                Nyxt
 version             2.0.0
 categories          www devel
 maintainers         atlas.engineer:administrator
 description         A productivity focused, programmable browser.
 long_description    A productivity focused, programmable browser \
                     written and extensible in Common Lisp.
-homepage            https://next.atlas.engineer
+homepage            https://nyxt.atlas.engineer
 platforms           darwin
 supported_archs     x86_64
 license             BSD
 use_configure       no
 fetch.type          git
-git.url             https://github.com/atlas-engineer/next.git
+git.url             https://github.com/atlas-engineer/nyxt.git
 git.branch          de3648d5
 depends_build       port:sbcl
 depends_lib         port:libfixposix \
