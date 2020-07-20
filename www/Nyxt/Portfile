@@ -16,7 +16,7 @@ license             BSD
 use_configure       no
 fetch.type          git
 git.url             https://github.com/atlas-engineer/nyxt.git
-git.branch          de3648d5
+git.branch          307b6900
 depends_build       port:sbcl
 depends_lib         port:libfixposix \
                     port:webkit2-gtk-devel

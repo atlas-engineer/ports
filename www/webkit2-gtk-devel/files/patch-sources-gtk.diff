@@ -1,0 +1,10 @@
+--- Source/WebKit/SourcesGTK.txt.orig	2019-11-22 15:22:11.000000000 +0100
++++ Source/WebKit/SourcesGTK.txt	2020-07-17 12:53:51.000000000 +0200
+@@ -426,6 +426,7 @@
+ WebProcess/glib/WebProcessGLib.cpp
+ 
+ WebProcess/gtk/WaylandCompositorDisplay.cpp
++WebProcess/gtk/NSApplicationActivationPolicy.mm
+ WebProcess/gtk/WebProcessMainGtk.cpp
+ 
+ WebProcess/Plugins/Netscape/NetscapePluginNone.cpp
