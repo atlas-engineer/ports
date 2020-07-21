@@ -1,3 +1,4 @@
+#include "config.h"
 #import "NSApplicationActivationPolicy.h"
 #import <AppKit/AppKit.h>
 

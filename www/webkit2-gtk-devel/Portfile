@@ -98,6 +98,9 @@ patchfiles-append    process-executable-path.diff
 # add new sources for NSApplicationActivationPolicy.mm
 patchfiles-append    patch-sources-gtk.diff
 
+# patch web process to add call to SetActivationPolicyProhibited
+patchfiles-append    patch-web-process-main.diff
+
 # it is preferred to use the WebKit built in bmalloc if it builds on a given os.
 # it has improved security features, but not all systems can build it at present.
 
