@@ -1,23 +1,24 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
+PortGroup           active_variants 1.1
 
-name                Nyxt
-version             2.0.0
-categories          www devel
-maintainers         atlas.engineer:administrator
-description         A productivity focused, programmable browser.
-long_description    A productivity focused, programmable browser \
-                    written and extensible in Common Lisp.
-homepage            https://nyxt.atlas.engineer
-platforms           darwin
-supported_archs     x86_64
-license             BSD
-use_configure       no
-fetch.type          git
-git.url             https://github.com/atlas-engineer/nyxt.git
-git.branch          14ad9eb1
-depends_build       port:sbcl
-depends_lib         port:libfixposix \
-                    port:webkit2-gtk-devel
-
+name                    Nyxt
+version                 2.0.0
+categories              www devel
+maintainers             atlas.engineer:administrator
+description             A productivity focused, programmable browser.
+long_description        A productivity focused, programmable browser \
+                        written and extensible in Common Lisp.
+homepage                https://nyxt.atlas.engineer
+platforms               darwin
+supported_archs         x86_64
+license                 BSD
+use_configure           no
+fetch.type              git
+git.url                 https://github.com/atlas-engineer/nyxt.git
+git.branch              14ad9eb1
+depends_build           port:sbcl
+depends_lib             port:libfixposix \
+                        port:webkit2-gtk-devel
+require_active_variants port:webkit2-gtk-devel quartz
