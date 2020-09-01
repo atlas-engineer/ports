@@ -122,8 +122,8 @@ post-patch {
     file copy ${filespath}/NSApplicationActivationPolicy.mm ${worksrcpath}/Source/WebKit/WebProcess/gtk/NSApplicationActivationPolicy.mm
 }
 
-if {![variant_isset quartz]} {
-    default_variants-append +x11
+if {![variant_isset x11]} {
+    default_variants-append +quartz
 }
 
 # this is nice to have, and should be the default
