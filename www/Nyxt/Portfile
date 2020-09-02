@@ -21,4 +21,3 @@ git.branch              14ad9eb1
 depends_build           port:sbcl
 depends_lib             port:libfixposix \
                         port:webkit2-gtk-devel
-require_active_variants port:webkit2-gtk-devel quartz
